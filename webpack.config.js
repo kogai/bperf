@@ -10,7 +10,10 @@ const output = path.resolve(__dirname, "public");
 const styledComponentsTransformer = createStyledComponentsTransformer();
 
 module.exports = {
-  entry: "./client/app.tsx",
+  entry: {
+    bperf: "./bperf/main.ts",
+    main: "./client/main.tsx"
+  },
   module: {
     rules: [
       {
@@ -34,7 +37,11 @@ module.exports = {
     extensions: [".tsx", ".ts", ".js"]
   },
   output: {
-    filename: "[name].[chunkhash].js",
+    filename: chunkData => {
+      return chunkData.chunk.name === "bperf"
+        ? "[name].js"
+        : "[name].[chunkhash].js";
+    },
     chunkFilename: "[name].[chunkhash].js",
     path: output
   },
