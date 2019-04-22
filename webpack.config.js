@@ -11,7 +11,7 @@ const styledComponentsTransformer = createStyledComponentsTransformer();
 
 module.exports = {
   entry: {
-    bperf: "./bperf/main.ts",
+    beacon: "./beacon/main.ts",
     main: "./client/main.tsx"
   },
   module: {

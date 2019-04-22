@@ -1,6 +1,24 @@
+const beacon = new Image();
+const SERVER = "http://localhost:5000/beacon?";
+
+type Payload = {
+  time: number;
+  event_type: string;
+};
+
+const queryToString = ({ time, event_type }: Payload): string => {
+  return `t=${time}&e=${event_type}`;
+};
+
 const mutationWatcher = new MutationObserver(list => {
   console.log("[EVENT] On DOM mutate", list.length);
   list.forEach(entry => {
+    beacon.src =
+      SERVER +
+      queryToString({
+        time: window.performance.now(),
+        event_type: entry.type
+      });
     if (entry.type == "childList") {
       console.log(
         "A child node has been added(%s) or removed(%s) [%d].",
@@ -8,9 +26,6 @@ const mutationWatcher = new MutationObserver(list => {
         entry.removedNodes,
         window.performance.now()
       );
-      // console.log((entry.target as any).innerText);
-      // console.log(entry.addedNodes[0]);
-      // console.log(entry.target.textContent);
     } else if (entry.type == "attributes") {
       console.log("The " + entry.attributeName + " attribute was modified.");
     } else {
@@ -22,6 +37,21 @@ const mutationWatcher = new MutationObserver(list => {
 const performanceWatcher = new PerformanceObserver(list => {
   console.log("[EVENT] On Perf entity changed");
   list.getEntries().forEach(entry => {
+    if (entry.name.includes(SERVER)) {
+      return;
+    }
+    beacon.src =
+      SERVER +
+      queryToString({
+        time: entry.startTime,
+        event_type: entry.entryType
+      });
+    beacon.src =
+      SERVER +
+      queryToString({
+        time: entry.startTime + entry.duration,
+        event_type: entry.entryType
+      });
     console.log(
       "[%s]: %s %d..%d",
       entry.entryType,

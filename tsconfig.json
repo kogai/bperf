@@ -8,6 +8,7 @@
     "outDir": "./public",
     "rootDir": "./",
     "strict": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "skipLibCheck": true
   }
 }
