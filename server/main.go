@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -8,20 +9,35 @@ import (
 )
 
 type beacon struct {
-	eventType string
-	time      int16
+	EventType string `json:"eventType"`
+	Time      int16  `json:"time"`
 }
 
-func send(w http.ResponseWriter, r *http.Request) {
+var db = make([]beacon, 0)
+
+func beaconHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	time, _ := strconv.ParseFloat(r.URL.Query().Get("t"), 64)
 	eventType := r.URL.Query().Get("e")
 
-	b := beacon{time: int16(time), eventType: eventType}
-	fmt.Println(fmt.Sprintf("%v", b))
+	b := beacon{Time: int16(time), EventType: eventType}
+	db = append(db, b)
+	fmt.Println(fmt.Sprintf("%v", db))
 
 	_, err := w.Write(make([]byte, 0))
+	if err != nil {
+		_ = fmt.Errorf("%s", err)
+	}
+}
+
+func eventsHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	payload, _ := json.Marshal(db)
+
+	_, err := w.Write(payload)
 	if err != nil {
 		_ = fmt.Errorf("%s", err)
 	}
@@ -33,6 +49,7 @@ func main() {
 		port = p
 	}
 
-	http.HandleFunc("/beacon", send)
+	http.HandleFunc("/events", eventsHandler)
+	http.HandleFunc("/beacon", beaconHandler)
 	http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
 }

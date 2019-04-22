@@ -16,8 +16,9 @@ const createClient = <R>(host: string): HttpClient => ({
 
 const client = createClient("http://localhost:5000");
 
-type MyRes = {
-  a: string;
+export type Event = {
+  eventType: string;
+  time: number;
 };
 
-export const getItem = () => client.get<MyRes>("send");
+export const getEvents = () => client.get<Event[]>("events");

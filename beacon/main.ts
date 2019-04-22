@@ -27,7 +27,10 @@ const mutationWatcher = new MutationObserver(list => {
         window.performance.now()
       );
     } else if (entry.type == "attributes") {
-      console.log("The " + entry.attributeName + " attribute was modified.");
+      console.log(
+        "The " + entry.attributeName + " attribute was modified.",
+        entry.target
+      );
     } else {
       console.log(entry.target, entry.type, window.performance.now());
     }
