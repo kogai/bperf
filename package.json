@@ -4,6 +4,7 @@
   "description": "",
   "main": "client/app.tsx",
   "scripts": {
+    "type": "tsc",
     "start": "webpack-dev-server",
     "build": "webpack -d",
     "build:production": "webpack -p"

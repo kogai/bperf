@@ -23,7 +23,6 @@ func beaconHandler(w http.ResponseWriter, r *http.Request) {
 
 	b := beacon{Time: int64(time), EventType: eventType}
 	db = append(db, b)
-	fmt.Println(fmt.Sprintf("%v", db))
 
 	_, err := w.Write(make([]byte, 0))
 	if err != nil {
