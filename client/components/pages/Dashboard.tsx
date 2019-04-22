@@ -8,14 +8,18 @@ export type Props = { events: Event[]; onClick: () => void };
 export const Dashboard: ComponentType<Props> = ({ events, onClick }) => (
   <>
     <table>
-      {events.map(({ time, eventType }, i) => (
-        <tr key={i}>
+      <tbody>
+        <tr>
           <th>event type</th>
-          <td>{eventType}</td>
           <th>time</th>
-          <td>{time}</td>
         </tr>
-      ))}
+        {events.map(({ time, eventType }, i) => (
+          <tr key={i}>
+            <td>{eventType}</td>
+            <td>{time}</td>
+          </tr>
+        ))}
+      </tbody>
     </table>
     <button type="button" onClick={onClick}>
       update

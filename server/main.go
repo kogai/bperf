@@ -10,7 +10,7 @@ import (
 
 type beacon struct {
 	EventType string `json:"eventType"`
-	Time      int16  `json:"time"`
+	Time      int64  `json:"time"`
 }
 
 var db = make([]beacon, 0)
@@ -21,7 +21,7 @@ func beaconHandler(w http.ResponseWriter, r *http.Request) {
 	time, _ := strconv.ParseFloat(r.URL.Query().Get("t"), 64)
 	eventType := r.URL.Query().Get("e")
 
-	b := beacon{Time: int16(time), EventType: eventType}
+	b := beacon{Time: int64(time), EventType: eventType}
 	db = append(db, b)
 	fmt.Println(fmt.Sprintf("%v", db))
 
@@ -51,5 +51,13 @@ func main() {
 
 	http.HandleFunc("/events", eventsHandler)
 	http.HandleFunc("/beacon", beaconHandler)
-	http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
+	http.HandleFunc("/close", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Printf("on close event occurred.\n")
+	})
+
+	fmt.Printf("API Server has been started at :%s\n", port)
+	err := http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
+	if err != nil {
+		panic(err)
+	}
 }

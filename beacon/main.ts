@@ -1,13 +1,14 @@
 const beacon = new Image();
+const timeOrigin = performance.timeOrigin;
 const SERVER = "http://localhost:5000/beacon?";
 
 type Payload = {
   time: number;
-  event_type: string;
+  eventType: string;
 };
 
-const queryToString = ({ time, event_type }: Payload): string => {
-  return `t=${time}&e=${event_type}`;
+const queryToString = ({ time, eventType }: Payload): string => {
+  return `t=${Math.floor(time)}&e=${eventType}`;
 };
 
 const mutationWatcher = new MutationObserver(list => {
@@ -16,8 +17,8 @@ const mutationWatcher = new MutationObserver(list => {
     beacon.src =
       SERVER +
       queryToString({
-        time: window.performance.now(),
-        event_type: entry.type
+        time: timeOrigin + window.performance.now(),
+        eventType: entry.type
       });
     if (entry.type == "childList") {
       console.log(
@@ -46,14 +47,14 @@ const performanceWatcher = new PerformanceObserver(list => {
     beacon.src =
       SERVER +
       queryToString({
-        time: entry.startTime,
-        event_type: entry.entryType
+        time: timeOrigin + entry.startTime,
+        eventType: entry.entryType
       });
     beacon.src =
       SERVER +
       queryToString({
-        time: entry.startTime + entry.duration,
-        event_type: entry.entryType
+        time: timeOrigin + entry.startTime + entry.duration,
+        eventType: entry.entryType
       });
     console.log(
       "[%s]: %s %d..%d",
@@ -76,7 +77,8 @@ performanceWatcher.observe({
   entryTypes: ["frame", "navigation", "resource", "paint"]
 });
 
-window.addEventListener("close", () => {
+window.addEventListener("beforeunload", () => {
   mutationWatcher.disconnect();
   performanceWatcher.disconnect();
+  beacon.src = "http://localhost:5000/close";
 });
