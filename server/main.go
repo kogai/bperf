@@ -74,10 +74,11 @@ func main() {
 	port := ensureEnv("PORT", "5000")
 	initDb()
 
-	_, err = conn.Query("SELECT name FROM users WHERE email = $1", "a@a.com")
+	users, err := conn.Query("SELECT id FROM users WHERE id = $1", 0)
 	if err != nil {
 		panic(err)
 	}
+	fmt.Printf("Current user :%v\n", users)
 
 	http.HandleFunc("/events", eventsHandler)
 	http.HandleFunc("/beacon", beaconHandler)
