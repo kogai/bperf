@@ -16,6 +16,12 @@ references:
         npm install --no-save
         npm cache verify
 
+  install_vendor: &install_vendor
+    run:
+      name: Install vendor
+      command: |
+        dep ensure
+
   client_test: &client_test
     run:
       name: Client
@@ -29,6 +35,7 @@ jobs:
       - image: *server_image
     steps:
       - checkout
+      - *install_vendor
       - *server_test
   client:
     working_directory: ~/bperf
