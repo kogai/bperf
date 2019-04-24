@@ -1,12 +1,14 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/kogai/bperf/server/model"
@@ -27,44 +29,27 @@ func initDb() (*gorm.DB, error) {
 	return conn, err
 }
 
-func beaconHandler(conn *gorm.DB) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		time, _ := strconv.ParseFloat(r.URL.Query().Get("t"), 64)
-		eventType := r.URL.Query().Get("e")
+func beaconHandler(c *gin.Context) {
+	db := c.MustGet("db").(*gorm.DB)
+	time, _ := strconv.ParseFloat(c.Query("t"), 64)
+	eventType := c.Query("e")
 
-		bcn := model.Beacon{Time: int64(time), EventType: eventType, UserID: 1}
-		conn.Create(&bcn)
+	bcn := model.Beacon{Time: int64(time), EventType: eventType, UserID: 1}
+	db.Create(&bcn)
 
-		_, err := w.Write(make([]byte, 0))
-		if err != nil {
-			panic(err)
-		}
-	}
+	c.JSON(http.StatusOK, gin.H{})
 }
 
-func eventsHandler(conn *gorm.DB) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
+func eventsHandler(c *gin.Context) {
+	db := c.MustGet("db").(*gorm.DB)
 
-		var beacons []model.Beacon
-		conn.Find(&beacons)
-		var payloads []model.BeaconJson
-		for _, b := range beacons {
-			payloads = append(payloads, model.BeaconToJson(&b))
-		}
-		payload, err := json.Marshal(payloads)
-		if err != nil {
-			panic(err)
-		}
-
-		_, err = w.Write(payload)
-		if err != nil {
-			panic(err)
-		}
+	var beacons []model.Beacon
+	db.Find(&beacons)
+	var payloads []model.BeaconJson
+	for _, b := range beacons {
+		payloads = append(payloads, model.BeaconToJson(&b))
 	}
+	c.JSON(http.StatusOK, payloads)
 }
 
 func ensureEnv(name string, defaultValue interface{}) string {
@@ -79,7 +64,16 @@ func ensureEnv(name string, defaultValue interface{}) string {
 	return v
 }
 
+func dbMiddleWare(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Set("db", db)
+		c.Next()
+	}
+}
+
 func main() {
+	r := gin.Default()
+
 	var err error
 	port := ensureEnv("PORT", "5000")
 	conn, err := initDb()
@@ -87,6 +81,7 @@ func main() {
 		panic(err)
 	}
 	defer conn.Close()
+	r.Use(dbMiddleWare(conn))
 
 	tmpUser := model.User{Email: "bperf@example.com", EncryptedPassword: "***", Beacons: make([]model.Beacon, 0)}
 	conn.Create(&tmpUser)
@@ -95,14 +90,21 @@ func main() {
 	conn.AutoMigrate(&model.Beacon{})
 	conn.AutoMigrate(&model.User{})
 
-	http.HandleFunc("/events", eventsHandler(conn))
-	http.HandleFunc("/beacon", beaconHandler(conn))
-	http.HandleFunc("/close", func(w http.ResponseWriter, r *http.Request) {
+	r.Use(cors.New(cors.Config{
+		AllowAllOrigins:  true,
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
+
+	r.GET("/events", eventsHandler)
+	r.GET("/beacon", beaconHandler)
+	r.GET("/close", func(c *gin.Context) {
 		fmt.Printf("on close event occurred.\n")
 	})
 
 	fmt.Printf("API Server has been started at :%s\n", port)
-	err = http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
+	err = r.Run()
 	if err != nil {
 		panic(err)
 	}
