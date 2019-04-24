@@ -7,16 +7,32 @@ services:
     build: "./server"
     links:
       - db
+    environment:
+      - DB_HOST=postgres
+      - DB_USER=$DB_USER
+      - DB_PASSWORD=$DB_PASSWORD
+      - DB_DATABASE=$DB_DATABASE
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+    volumes:
+      - "./server:/go/src/app"
+      - "/go/src/app/vendor"
+    networks:
+      infranet:
+        aliases:
+          - "postgres"
   db:
     restart: "always"
     ports:
       - 5432:5432
     environment:
-      - "DB_USER=bperf"
-      - "DB_PASSWORD=bperf"
-      - "DB_DATABASE=bperf"
-      - "POSTGRES_PASSWORD=password"
+      - DB_USER=$DB_USER
+      - DB_PASSWORD=$DB_PASSWORD
+      - DB_DATABASE=$DB_DATABASE
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
     build: "./db"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
     networks:
       infranet:
         aliases:
@@ -24,3 +40,6 @@ services:
 
 networks:
   infranet:
+
+volumes:
+  pg_data:

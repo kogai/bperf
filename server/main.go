@@ -1,33 +1,38 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
 	"strconv"
 
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 	_ "github.com/lib/pq"
 )
+
+type Product struct {
+	gorm.Model
+	Code  string
+	Price uint
+}
 
 type beacon struct {
 	EventType string `json:"eventType"`
 	Time      int64  `json:"time"`
 }
 
-var conn *sql.DB
 var db = make([]beacon, 0)
 
-func initDb() {
+func initDb() (*gorm.DB, error) {
 	user := ensureEnv("DB_USER", nil)
+	host := ensureEnv("DB_HOST", nil)
 	dbname := ensureEnv("DB_DATABASE", nil)
 	password := ensureEnv("DB_PASSWORD", nil)
 	var err error
-	conn, err = sql.Open("postgres", fmt.Sprintf("user=%s dbname=%s password=%s sslmode=disable", user, dbname, password))
-	if err != nil {
-		panic(err)
-	}
+	conn, err := gorm.Open("postgres", fmt.Sprintf("host=%s user=%s dbname=%s password=%s sslmode=disable", host, user, dbname, password))
+	return conn, err
 }
 
 func beaconHandler(w http.ResponseWriter, r *http.Request) {
@@ -72,13 +77,16 @@ func ensureEnv(name string, defaultValue interface{}) string {
 func main() {
 	var err error
 	port := ensureEnv("PORT", "5000")
-	initDb()
-
-	users, err := conn.Query("SELECT id FROM users WHERE id = $1", 0)
+	conn, err := initDb()
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("Current user :%v\n", users)
+	defer conn.Close()
+
+	var product Product
+	conn.First(&product, 1)
+	conn.First(&product, "code = ?", "L1212")
+	fmt.Printf("%v\n", product)
 
 	http.HandleFunc("/events", eventsHandler)
 	http.HandleFunc("/beacon", beaconHandler)
