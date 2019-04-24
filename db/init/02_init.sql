@@ -1,6 +1,16 @@
 \c bperf bperf
 
+CREATE TABLE organizations (
+  id UUID NOT NULL,
+  PRIMARY KEY(id)
+);
+
 CREATE TABLE users (
-  id CHAR(256) NOT NULL,
+  id UUID NOT NULL,
+  PRIMARY KEY(id)
+);
+
+CREATE TABLE organizations (
+  id UUID NOT NULL,
   PRIMARY KEY(id)
 );
