@@ -14,11 +14,6 @@ import (
 	"github.com/kogai/bperf/server/model"
 )
 
-type beacon struct {
-	EventType string `json:"eventType"`
-	Time      int64  `json:"time"`
-}
-
 func initDb() (*gorm.DB, error) {
 	user := ensureEnv("DB_USER", nil)
 	host := ensureEnv("DB_HOST", nil)
@@ -71,21 +66,13 @@ func dbMiddleWare(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
-func main() {
+func setRouter() *gin.Engine {
 	r := gin.Default()
-
-	var err error
-	port := ensureEnv("PORT", "5000")
 	conn, err := initDb()
 	if err != nil {
 		panic(err)
 	}
-	defer conn.Close()
 	r.Use(dbMiddleWare(conn))
-
-	tmpUser := model.User{Email: "bperf@example.com", EncryptedPassword: "***", Beacons: make([]model.Beacon, 0)}
-	conn.Create(&tmpUser)
-	defer conn.Delete(&tmpUser)
 
 	conn.AutoMigrate(&model.Beacon{})
 	conn.AutoMigrate(&model.User{})
@@ -102,9 +89,16 @@ func main() {
 	r.GET("/close", func(c *gin.Context) {
 		fmt.Printf("on close event occurred.\n")
 	})
+	return r
+}
 
+func main() {
+	r := setRouter()
+	// defer conn.Close()
+
+	port := ensureEnv("PORT", "5000")
 	fmt.Printf("API Server has been started at :%s\n", port)
-	err = r.Run()
+	err := r.Run()
 	if err != nil {
 		panic(err)
 	}
