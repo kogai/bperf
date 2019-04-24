@@ -20,7 +20,7 @@ references:
     run:
       name: Install vendor
       command: |
-        dep ensure
+        cd server && dep ensure
 
   client_test: &client_test
     run:
