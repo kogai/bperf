@@ -9,21 +9,13 @@ import (
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-	_ "github.com/lib/pq"
+	"github.com/kogai/bperf/server/model"
 )
-
-type Product struct {
-	gorm.Model
-	Code  string
-	Price uint
-}
 
 type beacon struct {
 	EventType string `json:"eventType"`
 	Time      int64  `json:"time"`
 }
-
-var db = make([]beacon, 0)
 
 func initDb() (*gorm.DB, error) {
 	user := ensureEnv("DB_USER", nil)
@@ -35,30 +27,43 @@ func initDb() (*gorm.DB, error) {
 	return conn, err
 }
 
-func beaconHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	time, _ := strconv.ParseFloat(r.URL.Query().Get("t"), 64)
-	eventType := r.URL.Query().Get("e")
+func beaconHandler(conn *gorm.DB) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		time, _ := strconv.ParseFloat(r.URL.Query().Get("t"), 64)
+		eventType := r.URL.Query().Get("e")
 
-	b := beacon{Time: int64(time), EventType: eventType}
-	db = append(db, b)
+		bcn := model.Beacon{Time: int64(time), EventType: eventType, UserID: 1}
+		conn.Create(&bcn)
 
-	_, err := w.Write(make([]byte, 0))
-	if err != nil {
-		_ = fmt.Errorf("%s", err)
+		_, err := w.Write(make([]byte, 0))
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
-func eventsHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+func eventsHandler(conn *gorm.DB) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 
-	payload, _ := json.Marshal(db)
+		var beacons []model.Beacon
+		conn.Find(&beacons)
+		var payloads []model.BeaconJson
+		for _, b := range beacons {
+			payloads = append(payloads, model.BeaconToJson(&b))
+		}
+		payload, err := json.Marshal(payloads)
+		if err != nil {
+			panic(err)
+		}
 
-	_, err := w.Write(payload)
-	if err != nil {
-		_ = fmt.Errorf("%s", err)
+		_, err = w.Write(payload)
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
@@ -83,13 +88,15 @@ func main() {
 	}
 	defer conn.Close()
 
-	var product Product
-	conn.First(&product, 1)
-	conn.First(&product, "code = ?", "L1212")
-	fmt.Printf("%v\n", product)
+	tmpUser := model.User{Email: "bperf@example.com", EncryptedPassword: "***", Beacons: make([]model.Beacon, 0)}
+	conn.Create(&tmpUser)
+	defer conn.Delete(&tmpUser)
 
-	http.HandleFunc("/events", eventsHandler)
-	http.HandleFunc("/beacon", beaconHandler)
+	conn.AutoMigrate(&model.Beacon{})
+	conn.AutoMigrate(&model.User{})
+
+	http.HandleFunc("/events", eventsHandler(conn))
+	http.HandleFunc("/beacon", beaconHandler(conn))
 	http.HandleFunc("/close", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("on close event occurred.\n")
 	})
