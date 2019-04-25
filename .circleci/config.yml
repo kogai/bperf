@@ -3,6 +3,7 @@ version: 2.1
 references:
   server_image: &server_image "circleci/golang:1.11.5"
   client_image: &client_image "circleci/node:9.8.0"
+  db_image: &db_image postgres:10.2-alpine
   server_test: &server_test
     run:
       name: Server
@@ -33,6 +34,7 @@ jobs:
     working_directory: /go/src/github.com/kogai/bperf
     docker:
       - image: *server_image
+      - image: *db_image
     steps:
       - checkout
       - *install_vendor
