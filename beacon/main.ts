@@ -33,6 +33,7 @@ const mutationWatcher = new MutationObserver(list => {
         entry.target
       );
     } else {
+      // characterData
       console.log(entry.target, entry.type, window.performance.now());
     }
   });

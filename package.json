@@ -23,6 +23,7 @@
   "devDependencies": {
     "@types/chart.js": "2.7.52",
     "@types/chartjs": "0.0.31",
+    "@types/ramda": "github:types/npm-ramda#dist",
     "@types/react": "16.8.13",
     "@types/react-dom": "16.8.4",
     "@types/react-router": "4.4.5",
@@ -40,6 +41,7 @@
   },
   "dependencies": {
     "chart.js": "2.8.0",
+    "ramda": "0.26.1",
     "react": "16.8.6",
     "react-chartjs-2": "2.7.6",
     "react-dom": "16.8.6",
