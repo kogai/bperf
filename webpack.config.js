@@ -12,7 +12,7 @@ const styledComponentsTransformer = createStyledComponentsTransformer();
 module.exports = {
   entry: {
     beacon: "./beacon/main.ts",
-    main: "./client/main.tsx"
+    main: "./web/main.tsx"
   },
   module: {
     rules: [
@@ -30,7 +30,7 @@ module.exports = {
   },
 
   plugins: [
-    new HtmlWebpackPlugin({ title: "bperf", template: "./client/index.html" }),
+    new HtmlWebpackPlugin({ title: "bperf", template: "./web/index.html" }),
     new CleanWebpackPlugin()
   ],
   resolve: {

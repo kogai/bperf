@@ -1,4 +1,4 @@
 /public
-/server/vendor
+/api/vendor
 /node_modules
 /logger.min.js

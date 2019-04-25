@@ -3,11 +3,12 @@ version: 2.1
 references:
   server_image: &server_image "circleci/golang:1.11.5"
   client_image: &client_image "circleci/node:9.8.0"
-  server_test: &server_test
+  db_image: &db_image postgres:9.3
+  api_test: &api_test
     run:
-      name: Server
+      name: API
       command: |
-        go test ./server
+        go test ./api
 
   install_node_modules: &install_node_modules
     run:
@@ -20,35 +21,37 @@ references:
     run:
       name: Install vendor
       command: |
-        cd server && dep ensure
+        cd api && dep ensure
 
-  client_test: &client_test
+  web_test: &web_test
     run:
       name: Client
       command: |
         npm run type
 
 jobs:
-  server:
+  api:
     working_directory: /go/src/github.com/kogai/bperf
     docker:
       - image: *server_image
+      - image: *db_image
+
     steps:
       - checkout
       - *install_vendor
-      - *server_test
-  client:
+      - *api_test
+  web:
     working_directory: ~/bperf
     docker:
       - image: *client_image
     steps:
       - checkout
       - *install_node_modules
-      - *client_test
+      - *web_test
 
 workflows:
   version: 2
   myjob:
     jobs:
-      - server
-      - client
+      - api
+      - web

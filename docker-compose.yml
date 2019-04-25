@@ -4,7 +4,7 @@ services:
     restart: "always"
     ports:
       - 5000:5000
-    build: "./server"
+    build: "./api"
     links:
       - db
     environment:
@@ -14,13 +14,14 @@ services:
       - DB_DATABASE=$DB_DATABASE
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
     volumes:
-      - "./server:/go/src/app"
+      - "./api:/go/src/app"
       - "/go/src/app/vendor"
     networks:
       infranet:
         aliases:
           - "postgres"
   db:
+    image: postgres:9.3
     restart: "always"
     ports:
       - 5432:5432
@@ -29,7 +30,6 @@ services:
       - DB_PASSWORD=$DB_PASSWORD
       - DB_DATABASE=$DB_DATABASE
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
-    build: "./db"
     volumes:
       - pg_data:/var/lib/postgresql/data
 
