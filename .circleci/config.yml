@@ -3,7 +3,7 @@ version: 2.1
 references:
   server_image: &server_image "circleci/golang:1.11.5"
   client_image: &client_image "circleci/node:9.8.0"
-  db_image: &db_image postgres:10.2-alpine
+  db_image: &db_image postgres:9.3
   server_test: &server_test
     run:
       name: Server
@@ -35,6 +35,7 @@ jobs:
     docker:
       - image: *server_image
       - image: *db_image
+
     steps:
       - checkout
       - *install_vendor

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 	"os"
@@ -14,13 +15,44 @@ import (
 	"github.com/kogai/bperf/server/model"
 )
 
-func initDb() (*gorm.DB, error) {
+func initDatabase() error {
+	var err error
+	user := ensureEnv("DB_USER", nil)
+	host := ensureEnv("DB_HOST", nil)
+	password := ensureEnv("DB_PASSWORD", nil)
+	dbname := ensureEnv("DB_DATABASE", nil)
+
+	conn, err := sql.Open("postgres", fmt.Sprintf("host=%s user=%s password=%s sslmode=disable", host, user, password))
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	_, err = conn.Exec(fmt.Sprintf("create database %s;", dbname))
+	if err != nil {
+		if err.Error() == fmt.Sprintf("pq: database \"%s\" already exists", dbname) {
+			return nil
+		}
+		return err
+	}
+	return nil
+}
+
+func establishConnection() (*gorm.DB, error) {
+	var err error
 	user := ensureEnv("DB_USER", nil)
 	host := ensureEnv("DB_HOST", nil)
 	dbname := ensureEnv("DB_DATABASE", nil)
 	password := ensureEnv("DB_PASSWORD", nil)
-	var err error
+
 	conn, err := gorm.Open("postgres", fmt.Sprintf("host=%s user=%s dbname=%s password=%s sslmode=disable", host, user, dbname, password))
+	if err != nil {
+		return nil, err
+	}
+
+	conn.AutoMigrate(&model.Beacon{})
+	conn.AutoMigrate(&model.User{})
+
 	return conn, err
 }
 
@@ -66,17 +98,19 @@ func dbMiddleWare(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
-func setRouter() *gin.Engine {
+func setRouter() (*gin.Engine, error) {
+	var err error
 	r := gin.Default()
-	conn, err := initDb()
+	err = initDatabase()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
+	conn, err := establishConnection()
+	if err != nil {
+		return nil, err
+	}
+
 	r.Use(dbMiddleWare(conn))
-
-	conn.AutoMigrate(&model.Beacon{})
-	conn.AutoMigrate(&model.User{})
-
 	r.Use(cors.New(cors.Config{
 		AllowAllOrigins:  true,
 		ExposeHeaders:    []string{"Content-Length"},
@@ -89,16 +123,20 @@ func setRouter() *gin.Engine {
 	r.GET("/close", func(c *gin.Context) {
 		fmt.Printf("on close event occurred.\n")
 	})
-	return r
+	return r, nil
 }
 
 func main() {
-	r := setRouter()
+	var err error
+	r, err := setRouter()
+	if err != nil {
+		panic(err)
+	}
 	// defer conn.Close()
 
 	port := ensureEnv("PORT", "5000")
 	fmt.Printf("API Server has been started at :%s\n", port)
-	err := r.Run()
+	err = r.Run()
 	if err != nil {
 		panic(err)
 	}

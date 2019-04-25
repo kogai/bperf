@@ -21,6 +21,7 @@ services:
         aliases:
           - "postgres"
   db:
+    image: postgres:9.3
     restart: "always"
     ports:
       - 5432:5432

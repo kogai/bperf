@@ -9,7 +9,10 @@ import (
 )
 
 func TestBeaconHandler(t *testing.T) {
-	router := setRouter()
+	var err error
+	router, err := setRouter()
+	assert.Equal(t, nil, err)
+
 	w := httptest.NewRecorder()
 	r, err := http.NewRequest("GET", "/beacon", nil)
 	router.ServeHTTP(w, r)
