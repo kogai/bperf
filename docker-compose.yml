@@ -30,7 +30,6 @@ services:
       - DB_PASSWORD=$DB_PASSWORD
       - DB_DATABASE=$DB_DATABASE
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
-    build: "./db"
     volumes:
       - pg_data:/var/lib/postgresql/data
 

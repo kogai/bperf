@@ -72,9 +72,9 @@ func eventsHandler(c *gin.Context) {
 
 	var beacons []model.Beacon
 	db.Find(&beacons)
-	var payloads []model.BeaconJson
+	var payloads []model.BeaconJSON
 	for _, b := range beacons {
-		payloads = append(payloads, model.BeaconToJson(&b))
+		payloads = append(payloads, model.BeaconToJSON(&b))
 	}
 	c.JSON(http.StatusOK, payloads)
 }

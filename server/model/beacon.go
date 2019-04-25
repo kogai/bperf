@@ -1,22 +1,20 @@
 package model
 
-import (
-	"github.com/jinzhu/gorm"
-)
-
 // Beacon accumulates beacons agent send.
 type Beacon struct {
-	gorm.Model
+	ID        uint   `gorm:"primary_key"`
 	EventType string `gorm:"not null"`
 	Time      int64  `gorm:"not null"`
 	UserID    uint   `gorm:"not null"`
 }
 
-type BeaconJson struct {
+// BeaconJSON represents shape of response.
+type BeaconJSON struct {
 	EventType string `json:"eventType"`
 	Time      int64  `json:"time"`
 }
 
-func BeaconToJson(b *Beacon) BeaconJson {
-	return BeaconJson{EventType: b.EventType, Time: b.Time}
+// BeaconToJSON is converter from Database model to JSON
+func BeaconToJSON(b *Beacon) BeaconJSON {
+	return BeaconJSON{EventType: b.EventType, Time: b.Time}
 }
