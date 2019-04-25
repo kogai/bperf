@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-	"github.com/kogai/bperf/server/model"
+	"github.com/kogai/bperf/api/model"
 )
 
 func initDatabase() error {

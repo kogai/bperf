@@ -4,7 +4,7 @@ services:
     restart: "always"
     ports:
       - 5000:5000
-    build: "./server"
+    build: "./api"
     links:
       - db
     environment:
@@ -14,7 +14,7 @@ services:
       - DB_DATABASE=$DB_DATABASE
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
     volumes:
-      - "./server:/go/src/app"
+      - "./api:/go/src/app"
       - "/go/src/app/vendor"
     networks:
       infranet:
