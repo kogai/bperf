@@ -4,7 +4,7 @@ import Axis
 import Browser
 import DateFormat
 import Debug exposing (log)
-import Html exposing (Html, pre, table, td, text, th, tr)
+import Html exposing (Html, div, pre, table, td, text, th, tr)
 import Http
 import Json.Decode as Decode exposing (Decoder, float, int, list, string)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
@@ -81,8 +81,7 @@ column scale ( date, value ) =
 
 view : List ( Time.Posix, Float ) -> Svg msg
 view model =
-    log "OK?"
-        svg
+    svg
         [ viewBox 0 0 w h ]
         [ style [] [ text """
             .column rect { fill: rgba(118, 214, 78, 0.8); }
@@ -188,9 +187,12 @@ my_view model =
                 )
 
 
-
--- pre [] [ text "fullText" ]
+root_view model =
+    div []
+        [ view timeSeries
+        , my_view model
+        ]
 
 
 main =
-    Browser.element { init = init, update = update, view = my_view, subscriptions = subscriptions }
+    Browser.element { init = init, update = update, view = root_view, subscriptions = subscriptions }
