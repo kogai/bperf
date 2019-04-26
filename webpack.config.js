@@ -11,21 +11,38 @@ const styledComponentsTransformer = createStyledComponentsTransformer();
 
 module.exports = {
   entry: {
-    beacon: "./beacon/main.ts",
-    main: "./web/main.tsx"
+    //   beacon: "./beacon/main.ts",
+    // main: "./web/main.tsx"
+    main: "./src/index.js"
   },
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
-        loader: "ts-loader",
-        exclude: /node_modules/,
-        options: {
-          getCustomTransformers: () => ({
-            before: [styledComponentsTransformer]
-          })
-        }
-      }
+        test: /\.elm$/,
+        loader: 'elm-webpack-loader',
+        exclude: [/elm-stuff/, /node_modules/],
+        options: {}
+      },
+      // {
+      //   test: /\.html$/,
+      //   exclude: /node_modules/,
+      //   use: {
+      //     loader: 'file-loader',
+      //     options: {
+      //       name: '[name].[ext]'
+      //     }
+      //   }
+      // },
+      // {
+      //   test: /\.tsx?$/,
+      //   loader: "ts-loader",
+      //   exclude: /node_modules/,
+      //   options: {
+      //     getCustomTransformers: () => ({
+      //       before: [styledComponentsTransformer]
+      //     })
+      //   }
+      // }
     ]
   },
 
@@ -34,7 +51,7 @@ module.exports = {
     new CleanWebpackPlugin()
   ],
   resolve: {
-    extensions: [".tsx", ".ts", ".js"]
+    extensions: [".tsx", ".ts", ".js", ".elm"]
   },
   output: {
     filename: chunkData => {
