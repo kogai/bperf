@@ -142,8 +142,6 @@ init _ =
     , Http.get
         { url = "http://localhost:5000/events"
         , expect = Http.expectJson GotText eventsDecoder
-
-        -- Http.expectJson
         }
     )
 
@@ -180,7 +178,7 @@ my_view model =
                     (\event ->
                         tr []
                             [ td [] [ text event.eventType ]
-                            , td [] [ text (String.fromInt event.time) ]
+                            , td [] [ text <| String.fromInt event.time ]
                             ]
                     )
                     fullText
