@@ -4,6 +4,7 @@ import Axis
 import Browser
 import DateFormat
 import Debug exposing (log)
+import HistogramChart
 import Html exposing (Html, div, pre, table, td, text, th, tr)
 import Http
 import Json.Decode as Decode exposing (Decoder, float, int, list, string)
@@ -167,7 +168,7 @@ my_view : Model -> Html Msg
 my_view model =
     case model of
         Failure ->
-            text "I was unable to load your book."
+            text "Unable to load events"
 
         Loading ->
             text "Loading..."
@@ -189,6 +190,7 @@ root_view model =
     div []
         [ view timeSeries
         , my_view model
+        , HistogramChart.main
         ]
 
 
