@@ -52,6 +52,7 @@ func establishConnection() (*gorm.DB, error) {
 
 	conn.AutoMigrate(&model.Beacon{})
 	conn.AutoMigrate(&model.User{})
+	conn.LogMode(true)
 
 	return conn, err
 }
@@ -71,7 +72,7 @@ func eventsHandler(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 
 	var beacons []model.Beacon
-	db.Find(&beacons)
+	db.Where("event_type = ?", "childList").Limit(50).Find(&beacons)
 	var payloads []model.BeaconJSON
 	for _, b := range beacons {
 		payloads = append(payloads, model.BeaconToJSON(&b))

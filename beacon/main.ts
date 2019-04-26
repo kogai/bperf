@@ -21,18 +21,19 @@ const mutationWatcher = new MutationObserver(list => {
         eventType: entry.type
       });
     if (entry.type == "childList") {
-      console.log(
-        "A child node has been added(%s) or removed(%s) [%d].",
-        entry.addedNodes,
-        entry.removedNodes,
-        window.performance.now()
-      );
+      // console.log(
+      //   "A child node has been added(%s) or removed(%s) [%d].",
+      //   entry.addedNodes,
+      //   entry.removedNodes,
+      //   window.performance.now()
+      // );
     } else if (entry.type == "attributes") {
-      console.log(
-        "The " + entry.attributeName + " attribute was modified.",
-        entry.target
-      );
+      // console.log(
+      //   "The " + entry.attributeName + " attribute was modified.",
+      //   entry.target
+      // );
     } else {
+      // characterData
       console.log(entry.target, entry.type, window.performance.now());
     }
   });
