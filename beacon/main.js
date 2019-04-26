@@ -2,12 +2,7 @@ const beacon = new Image();
 const timeOrigin = performance.timeOrigin;
 const SERVER = "http://localhost:5000/beacon?";
 
-type Payload = {
-  time: number;
-  eventType: string;
-};
-
-const queryToString = ({ time, eventType }: Payload): string => {
+const queryToString = ({ time, eventType }) => {
   return `t=${Math.floor(time)}&e=${eventType}`;
 };
 

@@ -2,47 +2,22 @@ const webpack = require("webpack");
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
-const {
-  default: createStyledComponentsTransformer
-} = require("typescript-plugin-styled-components");
 
 const output = path.resolve(__dirname, "public");
-const styledComponentsTransformer = createStyledComponentsTransformer();
 
 module.exports = {
   entry: {
-    //   beacon: "./beacon/main.ts",
-    // main: "./web/main.tsx"
-    main: "./src/index.js"
+    beacon: "./beacon/main.js",
+    main: "./web/index.js"
   },
   module: {
     rules: [
       {
         test: /\.elm$/,
-        loader: 'elm-webpack-loader',
+        loader: "elm-webpack-loader",
         exclude: [/elm-stuff/, /node_modules/],
         options: {}
-      },
-      // {
-      //   test: /\.html$/,
-      //   exclude: /node_modules/,
-      //   use: {
-      //     loader: 'file-loader',
-      //     options: {
-      //       name: '[name].[ext]'
-      //     }
-      //   }
-      // },
-      // {
-      //   test: /\.tsx?$/,
-      //   loader: "ts-loader",
-      //   exclude: /node_modules/,
-      //   options: {
-      //     getCustomTransformers: () => ({
-      //       before: [styledComponentsTransformer]
-      //     })
-      //   }
-      // }
+      }
     ]
   },
 
@@ -51,7 +26,7 @@ module.exports = {
     new CleanWebpackPlugin()
   ],
   resolve: {
-    extensions: [".tsx", ".ts", ".js", ".elm"]
+    extensions: [".js", ".elm"]
   },
   output: {
     filename: chunkData => {
