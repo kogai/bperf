@@ -1,34 +1,14 @@
--- module Main exposing (Msg(..), main, update, view)
--- import Browser
--- import Html exposing (Html, button, div, text)
--- import Html.Events exposing (onClick)
--- main =
---     Browser.sandbox { init = 0, update = update, view = view }
--- type Msg
---     = Increment
---     | Decrement
---     | Something Int
--- update msg model =
---     case msg of
---         Increment ->
---             model + 1
---         Decrement ->
---             model - 1
---         Something x ->
---             model + x
--- view model =
---     div []
---         [ button [ onClick Decrement ] [ text "-" ]
---         , div [] [ text (String.fromInt model) ]
---         , button [ onClick Increment ] [ text "+" ]
---         , button [ onClick (Something 10) ] [ text "10" ]
---         ]
-
-
 module Main exposing (main)
 
 import Axis
+import Browser
 import DateFormat
+import Debug exposing (log)
+import Html exposing (Html, pre, table, td, text, th, tr)
+import Http
+import Json.Decode as Decode exposing (Decoder, float, int, list, string)
+import Json.Decode.Pipeline exposing (hardcoded, optional, required)
+import List exposing (..)
 import SampleData exposing (timeSeries)
 import Scale exposing (BandConfig, BandScale, ContinuousScale, defaultBandConfig)
 import Time
@@ -101,7 +81,9 @@ column scale ( date, value ) =
 
 view : List ( Time.Posix, Float ) -> Svg msg
 view model =
-    svg [ viewBox 0 0 w h ]
+    log "OK?"
+        svg
+        [ viewBox 0 0 w h ]
         [ style [] [ text """
             .column rect { fill: rgba(118, 214, 78, 0.8); }
             .column text { display: none; }
@@ -117,5 +99,98 @@ view model =
         ]
 
 
+type Model
+    = Failure
+    | Loading
+    | Success Events
+
+
+type alias Event =
+    { time : Int
+    , eventType : String -- FIXME: Define as Custom type
+    }
+
+
+type alias Events =
+    List Event
+
+
+eventDecoder : Decoder Event
+eventDecoder =
+    Decode.succeed Event
+        |> required "time" int
+        |> required "eventType" string
+
+
+eventsDecoder =
+    Decode.list eventDecoder
+
+
+
+-- |> required "email" (nullable string)
+-- `null` decodes to `Nothing`
+-- |> optional "name" string "(fallback if name is `null` or not present)"
+-- |> hardcoded 1.0
+
+
+type Msg
+    = GotText (Result Http.Error Events)
+
+
+init : () -> ( Model, Cmd Msg )
+init _ =
+    ( Loading
+    , Http.get
+        { url = "http://localhost:5000/events"
+        , expect = Http.expectJson GotText eventsDecoder
+
+        -- Http.expectJson
+        }
+    )
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    case msg of
+        GotText result ->
+            case result of
+                Ok fullText ->
+                    ( Success fullText, Cmd.none )
+
+                Err _ ->
+                    ( Failure, Cmd.none )
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.none
+
+
+my_view : Model -> Html Msg
+my_view model =
+    case model of
+        Failure ->
+            text "I was unable to load your book."
+
+        Loading ->
+            text "Loading..."
+
+        Success fullText ->
+            table []
+                (List.map
+                    (\event ->
+                        tr []
+                            [ td [] [ text event.eventType ]
+                            , td [] [ text (String.fromInt event.time) ]
+                            ]
+                    )
+                    fullText
+                )
+
+
+
+-- pre [] [ text "fullText" ]
+
+
 main =
-    view timeSeries
+    Browser.element { init = init, update = update, view = my_view, subscriptions = subscriptions }

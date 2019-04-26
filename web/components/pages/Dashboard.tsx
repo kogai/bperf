@@ -32,7 +32,9 @@ export type Props = { events: Event[]; onClick: () => void };
 export const Dashboard: ComponentType<Props> = ({ events, onClick }) => {
   console.log(
     pipe(
-      groupBy<Event>(({ eventType }) => eventType)
+      (xs: Event[]) => xs.filter(x => x.eventType === "childList"),
+      (xs: Event[]) => xs.map(x => x.time)
+      // groupBy<Event>(({ eventType }) => eventType)
       // toPairs,
       // map(([key, beacons]) => {
 
