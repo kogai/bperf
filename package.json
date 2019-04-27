@@ -4,7 +4,7 @@
   "description": "",
   "main": "client/app.tsx",
   "scripts": {
-    "type": "npm run build",
+    "type": "elm make web/Main.elm",
     "start": "webpack-dev-server",
     "build": "webpack -d",
     "build:production": "webpack -p"
