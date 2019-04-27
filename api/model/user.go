@@ -4,10 +4,13 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+// Privilege is not documented.
+type Privilege string
+
 // User model
 type User struct {
 	gorm.Model
-	Email             string `gorm:"type:varchar(100);unique_index"`
-	EncryptedPassword string `gorm:"not null"`
-	Beacons           []Beacon
+	PlatformID string `gorm:"type:varchar(100);unique_index"`
+	Products   []Product
+	Privilege  Privilege `gorm:"not null"  sql:"type:privilege"`
 }
