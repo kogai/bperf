@@ -3,17 +3,31 @@ module HistogramChart exposing (main, view)
 {-| Renders a histogram of a randomly generated data set
 -}
 
+-- import Core exposing (Date)
+-- import Time exposing (Pos)
+
 import Axis
 import Color
 import Debug
 import Histogram exposing (Bin, HistogramGenerator)
 import Random exposing (Generator, Seed)
 import Scale exposing (BandConfig, BandScale, ContinuousScale, defaultBandConfig)
+import Time exposing (toHour, toMinute, toSecond, utc)
 import TypedSvg exposing (g, rect, svg)
 import TypedSvg.Attributes exposing (class, fill, transform)
 import TypedSvg.Attributes.InPx exposing (height, width, x, y)
 import TypedSvg.Core exposing (Svg)
 import TypedSvg.Types exposing (Fill(..), Transform(..))
+
+
+toUtcString : Time.Posix -> String
+toUtcString time =
+    String.fromInt (toHour utc time)
+        ++ ":"
+        ++ String.fromInt (toMinute utc time)
+        ++ ":"
+        ++ String.fromInt (toSecond utc time)
+        ++ " (UTC)"
 
 
 {-| We use addition here to approximate normal distribution.
@@ -73,7 +87,18 @@ yScaleFromBins bins =
 
 xAxis : List Float -> Svg msg
 xAxis model =
-    Axis.bottom [] <| xScale model
+    Axis.bottom
+        [ Axis.tickFormat
+            (\n ->
+                let
+                    _ =
+                        Debug.log "n" n
+                in
+                n |> round |> Time.millisToPosix |> toUtcString
+            )
+        ]
+    <|
+        xScale model
 
 
 yAxis : List (Bin Float Float) -> Svg msg
