@@ -106,7 +106,7 @@ type Model
 
 
 type alias Event =
-    { time : Int
+    { time : Float
     , eventType : String -- FIXME: Define as Custom type
     }
 
@@ -118,7 +118,7 @@ type alias Events =
 eventDecoder : Decoder Event
 eventDecoder =
     Decode.succeed Event
-        |> required "time" int
+        |> required "time" float
         |> required "eventType" string
 
 
@@ -174,23 +174,29 @@ my_view model =
             text "Loading..."
 
         Success fullText ->
-            table []
-                (List.map
-                    (\event ->
-                        tr []
-                            [ td [] [ text event.eventType ]
-                            , td [] [ text <| String.fromInt event.time ]
-                            ]
-                    )
-                    fullText
-                )
+            HistogramChart.view <| List.map (\event -> event.time) fullText
+
+
+
+-- Success fullText ->avh4/elm-color"
+--     table []
+--         (List.map
+--             (\event ->
+--                 tr []
+--                     [ td [] [ text event.eventType ]
+--                     , td [] [ text <| String.fromInt event.time ]
+--                     ]
+--             )
+--             fullText
+--         )
 
 
 root_view model =
     div []
-        [ view timeSeries
-        , my_view model
-        , HistogramChart.main
+        [ -- view timeSeries
+          my_view model
+
+        -- , HistogramChart.main
         ]
 
 
