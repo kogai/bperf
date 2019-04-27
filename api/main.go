@@ -86,7 +86,7 @@ func beaconHandler(c *gin.Context) {
 		ins := model.NetworkEvent{StartTime: int64(start), EndTime: int64(end)}
 		db.Create(&ins)
 	default:
-		panic(fmt.Sprintf("Beacon [%s] does not supported yet.", e))
+		fmt.Printf("Beacon [%s] does not supported yet.\n", e)
 	}
 
 	c.JSON(http.StatusOK, gin.H{})
