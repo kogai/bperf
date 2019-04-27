@@ -12,5 +12,5 @@ type User struct {
 	gorm.Model
 	PlatformID string `gorm:"type:varchar(100);unique_index"`
 	Products   []Product
-	Privilege  Privilege `gorm:"not null"  sql:"type:privilege"`
+	Privilege  Privilege `gorm:"not null" sql:"type:privilege"`
 }

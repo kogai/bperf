@@ -7,6 +7,6 @@ import (
 // MonitoringTarget is not documented.
 type MonitoringTarget struct {
 	gorm.Model
-	PublishableID string
+	PublishableID string `gorm:"not null"`
 	Sessions      []Session
 }

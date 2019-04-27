@@ -2,7 +2,7 @@ package model
 
 // UaOs is not documented.
 type UaOs struct {
-	Session Session
-	Ua      string
-	Os      string
+	Session Session `gorm:"not null"`
+	Ua      string  `gorm:"not null"`
+	Os      string  `gorm:"not null"`
 }

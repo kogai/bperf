@@ -14,7 +14,7 @@ type Product struct {
 	gorm.Model
 	Name              string
 	MonitoringTargets []MonitoringTarget
-	Users             []User    `gorm:"not null"`
+	Users             []User
 	APIKey            string    `gorm:"not null"`
 	PricePlan         PricePlan `gorm:"not null" sql:"type:price_plan"`
 }
