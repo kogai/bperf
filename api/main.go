@@ -51,7 +51,8 @@ func establishConnection() (*gorm.DB, error) {
 	}
 
 	_ = conn.Exec("CREATE TYPE price_plan AS ENUM ('free', 'developer', 'enterprise');")
-	_ = conn.Exec("CREATE TYPE event_type AS ENUM ('childList', 'frame', 'paint', 'characterData');")
+	_ = conn.Exec("CREATE TYPE event_type AS ENUM ('childList', 'attributes', 'characterData');")
+	_ = conn.Exec("CREATE TYPE render_duration_event AS ENUM ('frame', 'paint');")
 	_ = conn.Exec("CREATE TYPE privilege AS ENUM ('admin', 'developer', 'observer');")
 
 	conn.AutoMigrate(&model.MemoryUsage{})
@@ -59,6 +60,7 @@ func establishConnection() (*gorm.DB, error) {
 	conn.AutoMigrate(&model.NetworkEvent{})
 	conn.AutoMigrate(&model.Product{})
 	conn.AutoMigrate(&model.RenderEvent{})
+	conn.AutoMigrate(&model.RenderDuration{})
 	conn.AutoMigrate(&model.Session{})
 	conn.AutoMigrate(&model.UaOs{})
 	conn.AutoMigrate(&model.User{})
@@ -74,11 +76,16 @@ func beaconHandler(c *gin.Context) {
 	case "childList":
 	case "attributes":
 	case "characterData":
-	case "frame":
-	case "paint":
 		time, _ := strconv.ParseFloat(c.Query("t"), 64)
 		eventType, _ := model.ToEventType(e)
 		ins := model.RenderEvent{Time: int64(time), EventType: eventType}
+		db.Create(&ins)
+	case "frame":
+	case "paint":
+		start, _ := strconv.ParseFloat(c.Query("start"), 64)
+		end, _ := strconv.ParseFloat(c.Query("end"), 64)
+		eventType, _ := model.ToRenderDurationType(e)
+		ins := model.RenderDuration{StartTime: int64(start), EndTime: int64(end), EventType: eventType}
 		db.Create(&ins)
 	case "resource":
 		start, _ := strconv.ParseFloat(c.Query("start"), 64)
@@ -99,9 +106,9 @@ func eventsHandler(c *gin.Context) {
 	// db.Where("event_type = ?", "childList").Limit(50).Find(&beacons)
 	// db.Where("event_type = ?", "childList").Find(&beacons)
 	db.Find(&renderEvents)
-	var payloads []model.RenderEventJSON
+	var payloads = make([]model.RenderEventJSON, 0)
 	for _, r := range renderEvents {
-		payloads = append(payloads, r.BeaconToJSON())
+		payloads = append(payloads, r.ToJSON())
 	}
 	c.JSON(http.StatusOK, payloads)
 }

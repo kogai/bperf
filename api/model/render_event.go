@@ -10,8 +10,6 @@ type EventType string
 
 const (
 	ChildList     EventType = "childList"
-	Frame         EventType = "frame"
-	Paint         EventType = "paint"
 	CharacterData EventType = "characterData"
 	Attributes    EventType = "attibutes"
 	Unknown       EventType = "unknown"
@@ -21,10 +19,6 @@ func ToEventType(s string) (EventType, error) {
 	switch s {
 	case "childList":
 		return ChildList, nil
-	case "frame":
-		return Frame, nil
-	case "paint":
-		return Paint, nil
 	case "characterData":
 		return CharacterData, nil
 	case "attributes":
@@ -48,6 +42,6 @@ type RenderEvent struct {
 }
 
 // BeaconToJSON is converter from Database model to JSON
-func (r *RenderEvent) BeaconToJSON() RenderEventJSON {
+func (r *RenderEvent) ToJSON() RenderEventJSON {
 	return RenderEventJSON{EventType: r.EventType, Time: r.Time}
 }

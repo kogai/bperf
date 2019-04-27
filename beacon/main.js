@@ -6,59 +6,44 @@ const queryToString = ({ time, eventType }) => {
   return `t=${Math.floor(time)}&e=${eventType}`;
 };
 
+const performanceQueryToString = ({ startTime, endTime, eventType }) => {
+  return `start=${Math.floor(startTime)}&end=${Math.floor(
+    endTime
+  )}&e=${eventType}`;
+};
+
 const mutationWatcher = new MutationObserver(list => {
-  console.log("[EVENT] On DOM mutate", list.length);
+  // console.log("[EVENT] On DOM mutate", list.length);
   list.forEach(entry => {
     beacon.src =
       SERVER +
       queryToString({
         time: timeOrigin + window.performance.now(),
-        eventType: entry.type
+        eventType: entry.type // One of 'childList' 'attibutes' 'characterData'
       });
-    if (entry.type == "childList") {
-      // console.log(
-      //   "A child node has been added(%s) or removed(%s) [%d].",
-      //   entry.addedNodes,
-      //   entry.removedNodes,
-      //   window.performance.now()
-      // );
-    } else if (entry.type == "attributes") {
-      // console.log(
-      //   "The " + entry.attributeName + " attribute was modified.",
-      //   entry.target
-      // );
-    } else {
-      // characterData
-      console.log(entry.target, entry.type, window.performance.now());
-    }
   });
 });
 
 const performanceWatcher = new PerformanceObserver(list => {
-  console.log("[EVENT] On Perf entity changed");
+  // console.log("[EVENT] On Perf entity changed");
   list.getEntries().forEach(entry => {
     if (entry.name.includes(SERVER)) {
       return;
     }
     beacon.src =
       SERVER +
-      queryToString({
-        time: timeOrigin + entry.startTime,
-        eventType: entry.entryType
+      performanceQueryToString({
+        eventType: entry.entryType,
+        startTime: timeOrigin + entry.startTime,
+        endTime: timeOrigin + entry.startTime + entry.duration
       });
-    beacon.src =
-      SERVER +
-      queryToString({
-        time: timeOrigin + entry.startTime + entry.duration,
-        eventType: entry.entryType
-      });
-    console.log(
-      "[%s]: %s %d..%d",
-      entry.entryType,
-      entry.name,
-      entry.startTime,
-      entry.startTime + entry.duration
-    );
+    // console.log(
+    //   "[%s]: %s %d..%d",
+    //   entry.entryType,
+    //   entry.name,
+    //   entry.startTime,
+    //   entry.startTime + entry.duration
+    // );
   });
 });
 
