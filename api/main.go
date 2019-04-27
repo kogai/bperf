@@ -50,7 +50,19 @@ func establishConnection() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	conn.AutoMigrate(&model.Beacon{})
+	_ = conn.Exec("CREATE TYPE price_plan AS ENUM ('free', 'developer', 'enterprise');")
+	_ = conn.Exec("CREATE TYPE event_type AS ENUM ('childList', 'attributes', 'characterData');")
+	_ = conn.Exec("CREATE TYPE render_duration_event AS ENUM ('frame', 'paint');")
+	_ = conn.Exec("CREATE TYPE privilege AS ENUM ('admin', 'developer', 'observer');")
+
+	conn.AutoMigrate(&model.MemoryUsage{})
+	conn.AutoMigrate(&model.MonitoringTarget{})
+	conn.AutoMigrate(&model.NetworkEvent{})
+	conn.AutoMigrate(&model.Product{})
+	conn.AutoMigrate(&model.RenderEvent{})
+	conn.AutoMigrate(&model.RenderDuration{})
+	conn.AutoMigrate(&model.Session{})
+	conn.AutoMigrate(&model.UaOs{})
 	conn.AutoMigrate(&model.User{})
 	conn.LogMode(true)
 
@@ -59,11 +71,30 @@ func establishConnection() (*gorm.DB, error) {
 
 func beaconHandler(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
-	time, _ := strconv.ParseFloat(c.Query("t"), 64)
-	eventType := c.Query("e")
-
-	bcn := model.Beacon{Time: int64(time), EventType: eventType, UserID: 1}
-	db.Create(&bcn)
+	e := c.Query("e")
+	switch e {
+	case "childList":
+	case "attributes":
+	case "characterData":
+		time, _ := strconv.ParseFloat(c.Query("t"), 64)
+		eventType, _ := model.ToEventType(e)
+		ins := model.RenderEvent{Time: int64(time), EventType: eventType}
+		db.Create(&ins)
+	case "frame":
+	case "paint":
+		start, _ := strconv.ParseFloat(c.Query("start"), 64)
+		end, _ := strconv.ParseFloat(c.Query("end"), 64)
+		eventType, _ := model.ToRenderDurationType(e)
+		ins := model.RenderDuration{StartTime: int64(start), EndTime: int64(end), EventType: eventType}
+		db.Create(&ins)
+	case "resource":
+		start, _ := strconv.ParseFloat(c.Query("start"), 64)
+		end, _ := strconv.ParseFloat(c.Query("end"), 64)
+		ins := model.NetworkEvent{StartTime: int64(start), EndTime: int64(end)}
+		db.Create(&ins)
+	default:
+		fmt.Printf("Beacon [%s] does not supported yet.\n", e)
+	}
 
 	c.JSON(http.StatusOK, gin.H{})
 }
@@ -71,13 +102,13 @@ func beaconHandler(c *gin.Context) {
 func eventsHandler(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 
-	var beacons []model.Beacon
+	var renderEvents []model.RenderEvent
 	// db.Where("event_type = ?", "childList").Limit(50).Find(&beacons)
 	// db.Where("event_type = ?", "childList").Find(&beacons)
-	db.Find(&beacons)
-	var payloads []model.BeaconJSON
-	for _, b := range beacons {
-		payloads = append(payloads, model.BeaconToJSON(&b))
+	db.Find(&renderEvents)
+	var payloads = make([]model.RenderEventJSON, 0)
+	for _, r := range renderEvents {
+		payloads = append(payloads, r.ToJSON())
 	}
 	c.JSON(http.StatusOK, payloads)
 }

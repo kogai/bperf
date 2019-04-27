@@ -62,7 +62,7 @@ threshhold fn list domain =
                     _ =
                         Debug.log "binCount" <| List.length list
                 in
-                binCount (tupleMap fn domain) 5600
+                binCount (tupleMap fn domain) 100
            )
 
 
@@ -145,10 +145,7 @@ view model =
             histogram model
 
         _ =
-            Debug.log "bins" Histogram.float
-
-        _ =
-            Debug.log "bins" dynamicGenerator
+            Debug.log "bins" bins
     in
     svg
         [ width w, height h ]
