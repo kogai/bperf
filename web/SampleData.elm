@@ -1,7 +1,5 @@
 module SampleData exposing (timeSeries)
 
-import Dict exposing (Dict)
-import Graph
 import Time
 
 

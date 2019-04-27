@@ -1,14 +1,10 @@
-module HistogramChart exposing (main, view)
-
-{-| Renders a histogram of a randomly generated data set
--}
+module HistogramChart exposing (view)
 
 import Axis
 import Color
 import Debug
 import Histogram exposing (Bin, HistogramGenerator, Threshold, binCount)
-import Random exposing (Generator, Seed)
-import Scale exposing (BandConfig, BandScale, ContinuousScale, defaultBandConfig)
+import Scale exposing (ContinuousScale)
 import Time exposing (toHour, toMinute, toSecond, utc)
 import TypedSvg exposing (g, rect, svg)
 import TypedSvg.Attributes exposing (class, fill, transform)
@@ -27,24 +23,6 @@ toUtcString time =
         ++ " (UTC)"
 
 
-{-| We use addition here to approximate normal distribution.
--}
-generator : Generator (List Float)
-generator =
-    Random.list 500 <| Random.map2 (+) (Random.float 0 10) (Random.float 0 10)
-
-
-seed : Seed
-seed =
-    -- chosen by fair dice roll
-    Random.initialSeed 227852860
-
-
-data : List Float
-data =
-    Tuple.first <| Random.step generator seed
-
-
 tupleMap : (a -> b) -> ( a, a ) -> ( b, b )
 tupleMap f ( a1, a2 ) =
     ( f a1, f a2 )
@@ -57,7 +35,7 @@ threshhold fn list domain =
         |> logBase 2
         |> ceiling
         |> (+) 1
-        |> (\n ->
+        |> (\_ ->
                 let
                     _ =
                         Debug.log "binCount" <| List.length list
@@ -143,9 +121,6 @@ view model =
     let
         bins =
             histogram model
-
-        _ =
-            Debug.log "bins" bins
     in
     svg
         [ width w, height h ]
@@ -156,7 +131,3 @@ view model =
         , g [ transform [ Translate padding padding ], class [ "series" ] ] <|
             List.map (column model (yScaleFromBins bins)) bins
         ]
-
-
-main =
-    view data
