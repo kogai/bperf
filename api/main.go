@@ -73,7 +73,8 @@ func eventsHandler(c *gin.Context) {
 
 	var beacons []model.Beacon
 	// db.Where("event_type = ?", "childList").Limit(50).Find(&beacons)
-	db.Where("event_type = ?", "childList").Find(&beacons)
+	// db.Where("event_type = ?", "childList").Find(&beacons)
+	db.Find(&beacons)
 	var payloads []model.BeaconJSON
 	for _, b := range beacons {
 		payloads = append(payloads, model.BeaconToJSON(&b))

@@ -3,13 +3,10 @@ module HistogramChart exposing (main, view)
 {-| Renders a histogram of a randomly generated data set
 -}
 
--- import Core exposing (Date)
--- import Time exposing (Pos)
-
 import Axis
 import Color
 import Debug
-import Histogram exposing (Bin, HistogramGenerator)
+import Histogram exposing (Bin, HistogramGenerator, Threshold, binCount)
 import Random exposing (Generator, Seed)
 import Scale exposing (BandConfig, BandScale, ContinuousScale, defaultBandConfig)
 import Time exposing (toHour, toMinute, toSecond, utc)
@@ -48,16 +45,43 @@ data =
     Tuple.first <| Random.step generator seed
 
 
+tupleMap : (a -> b) -> ( a, a ) -> ( b, b )
+tupleMap f ( a1, a2 ) =
+    ( f a1, f a2 )
+
+
+threshhold : Threshold a Float
+threshhold fn list domain =
+    List.length list
+        |> toFloat
+        |> logBase 2
+        |> ceiling
+        |> (+) 1
+        |> (\n ->
+                let
+                    _ =
+                        Debug.log "binCount" <| List.length list
+                in
+                binCount (tupleMap fn domain) 5600
+           )
+
+
+dynamicGenerator : HistogramGenerator Float Float
+dynamicGenerator =
+    Histogram.custom threshhold (\n -> n)
+
+
 histogram : List Float -> List (Bin Float Float)
 histogram model =
-    Histogram.float
+    -- Histogram.float
+    dynamicGenerator
         |> Histogram.withDomain ( model |> List.head |> Maybe.withDefault 0, model |> List.reverse |> List.head |> Maybe.withDefault 100 )
         |> Histogram.compute model
 
 
 w : Float
 w =
-    900
+    800
 
 
 h : Float
@@ -85,20 +109,16 @@ yScaleFromBins bins =
         |> Scale.linear ( h - 2 * padding, 0 )
 
 
+timestampToLabel : Float -> String
+timestampToLabel x =
+    x |> round |> Time.millisToPosix |> toUtcString
+
+
 xAxis : List Float -> Svg msg
 xAxis model =
     Axis.bottom
-        [ Axis.tickFormat
-            (\n ->
-                let
-                    _ =
-                        Debug.log "n" n
-                in
-                n |> round |> Time.millisToPosix |> toUtcString
-            )
-        ]
-    <|
-        xScale model
+        [ Axis.tickFormat timestampToLabel ]
+        (xScale model)
 
 
 yAxis : List (Bin Float Float) -> Svg msg
@@ -125,7 +145,10 @@ view model =
             histogram model
 
         _ =
-            Debug.log "bins" bins
+            Debug.log "bins" Histogram.float
+
+        _ =
+            Debug.log "bins" dynamicGenerator
     in
     svg
         [ width w, height h ]
