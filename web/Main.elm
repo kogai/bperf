@@ -2,29 +2,35 @@ module Main exposing (main)
 
 import Browser
 import Browser.Navigation
-import Html exposing (Html, a, div, li, text, ul)
-import Html.Attributes exposing (href)
+import Debug
+import Html exposing (div, text)
 import Page.Dashboard
 import TypedSvg.Types exposing (AnchorAlignment(..), Transform(..))
 import Url
 import View.SignIn
 
 
-type alias Model =
-    { key : Browser.Navigation.Key
-    , url : Url.Url
-    }
-
-
-type alias Event =
-    { time : Float
-    , eventType : String -- FIXME: Define as Custom type
-    }
+type Model
+    = Redirect Browser.Navigation.Key
+    | Dashboard Browser.Navigation.Key Page.Dashboard.Model
+    | SignIn Browser.Navigation.Key
 
 
 init : () -> Url.Url -> Browser.Navigation.Key -> ( Model, Cmd Msg )
 init _ url key =
-    ( Model key url, Cmd.none )
+    case url.path of
+        "/sign_in" ->
+            ( SignIn key, Cmd.none )
+
+        "/dashboard" ->
+            let
+                ( m, c ) =
+                    Page.Dashboard.init ()
+            in
+            ( Dashboard key m, Cmd.map DashboardMsg c )
+
+        _ ->
+            ( Redirect key, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -35,6 +41,7 @@ subscriptions _ =
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
+    | DashboardMsg Page.Dashboard.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -43,43 +50,70 @@ update msg model =
         LinkClicked urlRequest ->
             case urlRequest of
                 Browser.Internal url ->
-                    ( model, Browser.Navigation.pushUrl model.key (Url.toString url) )
+                    ( model
+                    , Browser.Navigation.pushUrl
+                        (case model of
+                            Redirect key ->
+                                key
+
+                            Dashboard key _ ->
+                                key
+
+                            SignIn key ->
+                                key
+                        )
+                        (Url.toString url)
+                    )
 
                 Browser.External href ->
                     ( model, Browser.Navigation.load href )
 
-        UrlChanged url ->
-            ( { model | url = url }
+        UrlChanged _ ->
+            -- FIXME: Need to init
+            ( model
             , Cmd.none
             )
 
+        DashboardMsg subMsg ->
+            let
+                _ =
+                    Debug.log "on dashboard:msg" subMsg
 
-viewLink : String -> Html msg
-viewLink path =
-    li [] [ a [ href path ] [ text path ] ]
+                _ =
+                    Debug.log "on dashboard:model" model
+
+                ( key, subModel ) =
+                    case model of
+                        Dashboard k m ->
+                            ( k, m )
+
+                        _ ->
+                            Debug.todo "Tmp"
+
+                ( next, subCmd ) =
+                    Page.Dashboard.update subMsg subModel
+
+                _ =
+                    Debug.log "on dashboard:next" next
+            in
+            ( Dashboard key next
+            , Cmd.map DashboardMsg subCmd
+            )
 
 
-view : Model -> Browser.Document msg
+view : Model -> Browser.Document Msg
 view model =
     { title = "bperf-app"
     , body =
-        case model.url.path of
-            "/" ->
-                [ div [] [ text "Root" ]
-                , ul []
-                    [ viewLink "/root"
-                    , viewLink "/sign_in"
-                    , viewLink "/dashboard"
-                    ]
+        case model of
+            Dashboard _ m ->
+                [ Html.map DashboardMsg <| Page.Dashboard.view m
                 ]
 
-            "/dashboard" ->
-                [ Page.Dashboard.view () ]
+            SignIn _ ->
+                [ View.SignIn.view ]
 
-            "/sign_in" ->
-                [ View.SignIn.frame () ]
-
-            _ ->
+            Redirect _ ->
                 [ div [] [ text "404 Not found" ]
                 ]
     }

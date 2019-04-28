@@ -1,4 +1,4 @@
-module Page.Dashboard exposing (init, update, view)
+module Page.Dashboard exposing (Model, Msg, init, update, view)
 
 import Html exposing (Html, text)
 import Http
