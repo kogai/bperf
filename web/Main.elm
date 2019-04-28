@@ -4,9 +4,9 @@ import Browser
 import Browser.Navigation as Nav
 import Html exposing (div, text)
 import Page.Dashboard
+import Page.SignIn
 import TypedSvg.Types exposing (AnchorAlignment(..), Transform(..))
 import Url
-import View.SignIn
 
 
 type Model
@@ -54,6 +54,7 @@ type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
     | DashboardMsg Page.Dashboard.Msg
+    | SignInMsg Page.SignIn.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -83,6 +84,15 @@ update msg model =
             , Cmd.map DashboardMsg subCmd
             )
 
+        ( SignInMsg subMsg, SignIn k ) ->
+            let
+                ( _, subCmd ) =
+                    Page.SignIn.update subMsg ()
+            in
+            ( SignIn k
+            , Cmd.map SignInMsg subCmd
+            )
+
         _ ->
             ( model
             , Cmd.none
@@ -99,7 +109,8 @@ view model =
                 ]
 
             SignIn _ ->
-                [ View.SignIn.view ]
+                [ Html.map SignInMsg <| Page.SignIn.view ()
+                ]
 
             Redirect _ ->
                 [ div [] [ text "404 Not found" ]

@@ -5,6 +5,8 @@ const CleanWebpackPlugin = require("clean-webpack-plugin");
 
 const output = path.resolve(__dirname, "public");
 
+const { AUTH0_DOMAIN, AUTH0_CLIENT_ID } = process.env;
+
 module.exports = {
   entry: {
     beacon: "./beacon/main.js",
@@ -23,7 +25,11 @@ module.exports = {
 
   plugins: [
     new HtmlWebpackPlugin({ title: "bperf", template: "./web/index.html" }),
-    new CleanWebpackPlugin()
+    new CleanWebpackPlugin(),
+    new webpack.DefinePlugin({
+      "process.env.AUTH0_DOMAIN": JSON.stringify(AUTH0_DOMAIN),
+      "process.env.AUTH0_CLIENT_ID": JSON.stringify(AUTH0_CLIENT_ID)
+    })
   ],
   resolve: {
     extensions: [".js", ".elm"]
