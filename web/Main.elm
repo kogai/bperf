@@ -129,11 +129,8 @@ viewLink path =
     li [] [ a [ href path ] [ text path ] ]
 
 
+view : Model -> Browser.Document msg
 view model =
-    let
-        _ =
-            Debug.log "model" model.url.path
-    in
     { title = "bperf-app"
     , body =
         case model.url.path of
