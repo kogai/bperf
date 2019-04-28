@@ -1,12 +1,11 @@
 module Page.Dashboard exposing (Model, Msg, init, update, view)
 
-import Html exposing (Html, text)
+import Html exposing (Html)
 import Http
 import Json.Decode as Decode exposing (Decoder, float, list, string)
 import Json.Decode.Pipeline exposing (required)
-import TypedSvg.Core exposing (text)
 import TypedSvg.Types exposing (AnchorAlignment(..), Transform(..))
-import View.Dashboard
+import View.Dashboard as V
 
 
 type Model
@@ -65,12 +64,14 @@ update msg _ =
 
 view : Model -> Html Msg
 view model =
-    case model of
-        Failure ->
-            text "Unable to load events"
+    V.view <|
+        case model of
+            Failure ->
+                V.Failure
 
-        Loading ->
-            text "Loading..."
+            Loading ->
+                V.Loading
 
-        Success fullText ->
-            View.Dashboard.view <| List.map (\event -> event.time) fullText
+            Success events ->
+                V.Success <|
+                    List.map (\event -> event.time) events

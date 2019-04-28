@@ -14,8 +14,8 @@ view children =
                 , li [ class "level-item level-right" ] [ a [ href "/sign_in" ] [ text "sign out" ] ]
                 ]
             ]
-        , div [ class "container" ]
+        , div [ class "container", style "padding" "1rem" ]
             [ children
             ]
-        , footer [ class "footer" ] [ text "under development" ]
+        , footer [ class "footer" ] [ text "Footer is still under development" ]
         ]

@@ -1,8 +1,9 @@
-module View.Dashboard exposing (view)
+module View.Dashboard exposing (Props(..), view)
 
 import Axis
 import Color
 import Histogram exposing (Bin, HistogramGenerator, Threshold, binCount)
+import Html exposing (text)
 import Scale exposing (ContinuousScale)
 import Time exposing (toHour, toMinute, toSecond, utc)
 import TypedSvg exposing (g, rect, svg)
@@ -111,19 +112,33 @@ column model yScale { length, x0, x1 } =
         []
 
 
-view : List Float -> Svg msg
-view model =
-    let
-        bins =
-            histogram model
-    in
+type Props
+    = Failure
+    | Loading
+    | Success (List Float)
+
+
+view : Props -> Svg msg
+view props =
     Layout.view <|
-        svg
-            [ width w, height h ]
-            [ g [ transform [ Translate (padding - 1) (h - padding) ] ]
-                [ xAxis model ]
-            , g [ transform [ Translate (padding - 1) padding ] ]
-                [ yAxis bins ]
-            , g [ transform [ Translate padding padding ], class [ "series" ] ] <|
-                List.map (column model (yScaleFromBins bins)) bins
-            ]
+        case props of
+            Loading ->
+                text "Loading..."
+
+            Failure ->
+                text "Unable to load events"
+
+            Success events ->
+                let
+                    bins =
+                        histogram events
+                in
+                svg
+                    [ width w, height h ]
+                    [ g [ transform [ Translate (padding - 1) (h - padding) ] ]
+                        [ xAxis events ]
+                    , g [ transform [ Translate (padding - 1) padding ] ]
+                        [ yAxis bins ]
+                    , g [ transform [ Translate padding padding ], class [ "series" ] ] <|
+                        List.map (column events (yScaleFromBins bins)) bins
+                    ]
