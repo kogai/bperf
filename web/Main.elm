@@ -1,7 +1,7 @@
 module Main exposing (main)
 
 import Browser
-import Browser.Navigation
+import Browser.Navigation as Nav
 import Debug
 import Html exposing (div, text)
 import Page.Dashboard
@@ -11,12 +11,25 @@ import View.SignIn
 
 
 type Model
-    = Redirect Browser.Navigation.Key
-    | Dashboard Browser.Navigation.Key Page.Dashboard.Model
-    | SignIn Browser.Navigation.Key
+    = Redirect Nav.Key
+    | Dashboard Nav.Key Page.Dashboard.Model
+    | SignIn Nav.Key
 
 
-init : () -> Url.Url -> Browser.Navigation.Key -> ( Model, Cmd Msg )
+keyOf : Model -> Nav.Key
+keyOf model =
+    case model of
+        Redirect k ->
+            k
+
+        Dashboard k _ ->
+            k
+
+        SignIn k ->
+            k
+
+
+init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init _ url key =
     case url.path of
         "/sign_in" ->
@@ -25,7 +38,7 @@ init _ url key =
         "/dashboard" ->
             let
                 ( m, c ) =
-                    Page.Dashboard.init ()
+                    Page.Dashboard.init
             in
             ( Dashboard key m, Cmd.map DashboardMsg c )
 
@@ -51,35 +64,18 @@ update msg model =
             case urlRequest of
                 Browser.Internal url ->
                     ( model
-                    , Browser.Navigation.pushUrl
-                        (case model of
-                            Redirect key ->
-                                key
-
-                            Dashboard key _ ->
-                                key
-
-                            SignIn key ->
-                                key
-                        )
+                    , Nav.pushUrl
+                        (keyOf model)
                         (Url.toString url)
                     )
 
                 Browser.External href ->
-                    ( model, Browser.Navigation.load href )
+                    ( model, Nav.load href )
 
         UrlChanged { path } ->
             let
                 key =
-                    case model of
-                        Redirect k ->
-                            k
-
-                        Dashboard k _ ->
-                            k
-
-                        SignIn k ->
-                            k
+                    keyOf model
             in
             case path of
                 "/sign_in" ->
@@ -88,7 +84,7 @@ update msg model =
                 "/dashboard" ->
                     let
                         ( m, c ) =
-                            Page.Dashboard.init ()
+                            Page.Dashboard.init
                     in
                     ( Dashboard key m, Cmd.map DashboardMsg c )
 
