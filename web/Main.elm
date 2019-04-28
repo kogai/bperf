@@ -71,26 +71,8 @@ update msg model =
                 Browser.External href ->
                     ( model, Nav.load href )
 
-        ( UrlChanged { path }, _ ) ->
-            let
-                key =
-                    keyOf model
-            in
-            case path of
-                "/sign_in" ->
-                    ( SignIn key, Cmd.none )
-
-                "/dashboard" ->
-                    let
-                        ( m, c ) =
-                            Page.Dashboard.init
-                    in
-                    ( Dashboard key m, Cmd.map DashboardMsg c )
-
-                _ ->
-                    ( Redirect key
-                    , Cmd.none
-                    )
+        ( UrlChanged url, _ ) ->
+            init () url (keyOf model)
 
         ( DashboardMsg subMsg, Dashboard k m ) ->
             let
