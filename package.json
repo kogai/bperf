@@ -4,7 +4,7 @@
   "description": "",
   "main": "web/Main.elm",
   "scripts": {
-    "type": "elm make web/Main.elm",
+    "type": "elm make web/Main.elm --output tmp/main.js",
     "lint:elm": "elm-analyse",
     "start": "webpack-dev-server",
     "build": "webpack -d",
