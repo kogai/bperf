@@ -2,17 +2,17 @@ module Main exposing (main)
 
 import Browser
 import Browser.Navigation
-import Dashboard
 import HistogramChart
 import Html exposing (Html, a, div, li, text, ul)
 import Html.Attributes exposing (href)
 import Http
 import Json.Decode as Decode exposing (Decoder, float, list, string)
 import Json.Decode.Pipeline exposing (required)
-import SignIn
 import TypedSvg.Core exposing (text)
 import TypedSvg.Types exposing (AnchorAlignment(..), Transform(..))
 import Url
+import View.Dashboard
+import View.SignIn
 
 
 
@@ -147,10 +147,10 @@ view model =
                 ]
 
             "/dashboard" ->
-                [ Dashboard.view () ]
+                [ View.Dashboard.frame () ]
 
             "/sign_in" ->
-                [ SignIn.view () ]
+                [ View.SignIn.frame () ]
 
             _ ->
                 [ div [] [ text "404 Not found" ]

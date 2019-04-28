@@ -1,8 +1,8 @@
-module Dashboard exposing (view)
+module View.Dashboard exposing (frame)
 
 import Html exposing (Html, div, text)
 
 
-view : () -> Html msg
-view _ =
+frame : () -> Html msg
+frame _ =
     div [] [ text "Dashboard" ]
