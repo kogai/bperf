@@ -68,20 +68,37 @@ update msg model =
                 Browser.External href ->
                     ( model, Browser.Navigation.load href )
 
-        UrlChanged _ ->
-            -- FIXME: Need to init
-            ( model
-            , Cmd.none
-            )
+        UrlChanged { path } ->
+            let
+                key =
+                    case model of
+                        Redirect k ->
+                            k
+
+                        Dashboard k _ ->
+                            k
+
+                        SignIn k ->
+                            k
+            in
+            case path of
+                "/sign_in" ->
+                    ( SignIn key, Cmd.none )
+
+                "/dashboard" ->
+                    let
+                        ( m, c ) =
+                            Page.Dashboard.init ()
+                    in
+                    ( Dashboard key m, Cmd.map DashboardMsg c )
+
+                _ ->
+                    ( Redirect key
+                    , Cmd.none
+                    )
 
         DashboardMsg subMsg ->
             let
-                _ =
-                    Debug.log "on dashboard:msg" subMsg
-
-                _ =
-                    Debug.log "on dashboard:model" model
-
                 ( key, subModel ) =
                     case model of
                         Dashboard k m ->
