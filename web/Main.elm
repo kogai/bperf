@@ -2,7 +2,6 @@ module Main exposing (main)
 
 import Browser
 import Browser.Navigation as Nav
-import Debug
 import Html exposing (div, text)
 import Page.Dashboard
 import TypedSvg.Types exposing (AnchorAlignment(..), Transform(..))
@@ -59,8 +58,8 @@ type Msg
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
-        LinkClicked urlRequest ->
+    case ( msg, model ) of
+        ( LinkClicked urlRequest, _ ) ->
             case urlRequest of
                 Browser.Internal url ->
                     ( model
@@ -72,7 +71,7 @@ update msg model =
                 Browser.External href ->
                     ( model, Nav.load href )
 
-        UrlChanged { path } ->
+        ( UrlChanged { path }, _ ) ->
             let
                 key =
                     keyOf model
@@ -93,24 +92,18 @@ update msg model =
                     , Cmd.none
                     )
 
-        DashboardMsg subMsg ->
+        ( DashboardMsg subMsg, Dashboard k m ) ->
             let
-                ( key, subModel ) =
-                    case model of
-                        Dashboard k m ->
-                            ( k, m )
-
-                        _ ->
-                            Debug.todo "Tmp"
-
-                ( next, subCmd ) =
-                    Page.Dashboard.update subMsg subModel
-
-                _ =
-                    Debug.log "on dashboard:next" next
+                ( subModel, subCmd ) =
+                    Page.Dashboard.update subMsg m
             in
-            ( Dashboard key next
+            ( Dashboard k subModel
             , Cmd.map DashboardMsg subCmd
+            )
+
+        _ ->
+            ( model
+            , Cmd.none
             )
 
 
