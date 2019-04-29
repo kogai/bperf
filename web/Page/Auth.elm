@@ -57,8 +57,8 @@ decode v =
                 v
     in
     case decoded of
-        Err _ ->
-            Err (AuthError "decode error" "something happened.")
+        Err reason ->
+            Err (AuthError "decode error" (D.errorToString reason))
 
         Ok result ->
             result
@@ -70,17 +70,8 @@ type alias Model =
 
 type Msg
     = AuthComplete E.Value
-
-
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg _ =
-    case msg of
-        AuthComplete v ->
-            let
-                _ =
-                    decode v
-            in
-            ( (), Cmd.none )
+    | Success AuthSuccess
+    | Failure AuthError
 
 
 init : ( Model, Cmd Msg )
@@ -88,6 +79,24 @@ init =
     ( ()
     , onVisitAuthCallback ()
     )
+
+
+update : Msg -> Model -> Model
+update msg _ =
+    case msg of
+        AuthComplete v ->
+            case decode v of
+                Ok x ->
+                    -- ( (), Success x )
+                    ()
+
+                Err x ->
+                    -- ( (), Cmd.none )
+                    ()
+
+        _ ->
+            -- ( (), )
+            ()
 
 
 view : Model -> Html Msg
