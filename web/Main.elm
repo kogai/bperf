@@ -2,9 +2,13 @@ module Main exposing (main)
 
 import Browser
 import Browser.Navigation as Nav
+import Debug
 import Html exposing (div, text)
+import Json.Encode as E
+import Page.AuthComplete
 import Page.Dashboard
 import Page.SignIn
+import Port.WebAuth
 import TypedSvg.Types exposing (AnchorAlignment(..), Transform(..))
 import Url
 
@@ -13,6 +17,7 @@ type Model
     = Redirect Nav.Key
     | Dashboard Nav.Key Page.Dashboard.Model
     | SignIn Nav.Key
+    | AuthComplete Nav.Key
 
 
 keyOf : Model -> Nav.Key
@@ -21,10 +26,13 @@ keyOf model =
         Redirect k ->
             k
 
-        Dashboard k _ ->
+        AuthComplete k ->
             k
 
         SignIn k ->
+            k
+
+        Dashboard k _ ->
             k
 
 
@@ -41,13 +49,25 @@ init _ url key =
             in
             ( Dashboard key m, Cmd.map DashboardMsg c )
 
+        "/auth/callback" ->
+            let
+                ( _, c ) =
+                    Page.AuthComplete.init
+            in
+            ( AuthComplete key, Cmd.map AuthCompleteMsg c )
+
         _ ->
             ( Redirect key, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Sub.none
+subscriptions model =
+    case model of
+        AuthComplete _ ->
+            Sub.batch [ Port.WebAuth.onAuthComplete FromJs ]
+
+        _ ->
+            Sub.none
 
 
 type Msg
@@ -55,6 +75,8 @@ type Msg
     | UrlChanged Url.Url
     | DashboardMsg Page.Dashboard.Msg
     | SignInMsg Page.SignIn.Msg
+    | AuthCompleteMsg Page.AuthComplete.Msg
+    | FromJs E.Value
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -93,6 +115,20 @@ update msg model =
             , Cmd.map SignInMsg subCmd
             )
 
+        ( FromJs subMsg, AuthComplete k ) ->
+            let
+                -- ( _, subCmd ) =
+                --     Page.AuthComplete.update subMsg ()
+                _ =
+                    Debug.log "msg" subMsg
+            in
+            -- ( SignIn k
+            -- , Cmd.map SignInMsg subCmd
+            -- )
+            ( model
+            , Cmd.none
+            )
+
         _ ->
             ( model
             , Cmd.none
@@ -110,6 +146,10 @@ view model =
 
             SignIn _ ->
                 [ Html.map SignInMsg <| Page.SignIn.view ()
+                ]
+
+            AuthComplete _ ->
+                [ Html.map AuthCompleteMsg <| Page.AuthComplete.view ()
                 ]
 
             Redirect _ ->
