@@ -1,4 +1,4 @@
-port module Model.Auth exposing (Model(..), Msg(..), doVisitAuthCallback, init, onAuthComplete, update)
+port module Model.Auth exposing (AuthSuccess, Model(..), Msg(..), doVisitAuthCallback, init, onAuthComplete, update)
 
 import Json.Decode as D exposing (Decoder, int, oneOf, string)
 import Json.Decode.Pipeline exposing (required)
@@ -77,9 +77,14 @@ decode v =
             result
 
 
-init : Model
-init =
-    UnAuthorized
+init : Maybe AuthSuccess -> Model
+init auth =
+    case auth of
+        Just x ->
+            Success x
+
+        Nothing ->
+            UnAuthorized
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )

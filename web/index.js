@@ -1,8 +1,13 @@
 const { Elm } = require("./Main");
 const { AUTH0_DOMAIN, AUTH0_CLIENT_ID, API_ROOT } = process.env;
 
+const STORAGE_KEY = "sessions";
+
 const app = Elm.Main.init({
-  flags: API_ROOT,
+  flags: {
+    apiRoot: API_ROOT,
+    sessions: JSON.parse(localStorage.getItem(STORAGE_KEY))
+  },
   node: document.getElementById("root")
 });
 

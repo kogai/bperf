@@ -9,7 +9,9 @@ import Url
 
 
 type alias Flags =
-    String
+    { apiRoot : String
+    , sessions : Maybe A.AuthSuccess
+    }
 
 
 type alias Model =
@@ -50,11 +52,11 @@ whenUrlChanged model route =
 
 
 init : Flags -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
-init apiRoot url key =
+init { apiRoot, sessions } url key =
     let
         model =
             { route = R.init url key
-            , auth = A.init
+            , auth = A.init sessions
             , chart = C.init
             , apiRoot = apiRoot
             }
