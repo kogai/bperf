@@ -5,7 +5,7 @@ const CleanWebpackPlugin = require("clean-webpack-plugin");
 
 const output = path.resolve(__dirname, "public");
 
-const { AUTH0_DOMAIN, AUTH0_CLIENT_ID } = process.env;
+const { AUTH0_DOMAIN, AUTH0_CLIENT_ID, API_ROOT } = process.env;
 
 module.exports = {
   entry: {
@@ -28,6 +28,7 @@ module.exports = {
     new CleanWebpackPlugin(),
     new webpack.DefinePlugin({
       "process.env": {
+        API_ROOT: JSON.stringify(API_ROOT),
         AUTH0_DOMAIN: JSON.stringify(AUTH0_DOMAIN),
         AUTH0_CLIENT_ID: JSON.stringify(AUTH0_CLIENT_ID)
       }

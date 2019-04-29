@@ -73,15 +73,12 @@ func beaconHandler(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 	e := c.Query("e")
 	switch e {
-	case "childList":
-	case "attributes":
-	case "characterData":
+	case "childList", "attributes", "characterData":
 		time, _ := strconv.ParseFloat(c.Query("t"), 64)
 		eventType, _ := model.ToEventType(e)
 		ins := model.RenderEvent{Time: int64(time), EventType: eventType}
 		db.Create(&ins)
-	case "frame":
-	case "paint":
+	case "frame", "paint":
 		start, _ := strconv.ParseFloat(c.Query("start"), 64)
 		end, _ := strconv.ParseFloat(c.Query("end"), 64)
 		eventType, _ := model.ToRenderDurationType(e)

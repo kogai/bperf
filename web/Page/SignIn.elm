@@ -1,27 +1,11 @@
-port module Page.SignIn exposing (Msg, update, view)
+module Page.SignIn exposing (view)
 
 import Html exposing (Html)
+import Model as M
+import Model.Auth
 import View.SignIn as V
 
 
-type alias Model =
-    ()
-
-
-type Msg
-    = OnSignIn
-
-
-port onSignIn : () -> Cmd msg
-
-
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg _ =
-    case msg of
-        OnSignIn ->
-            ( (), onSignIn () )
-
-
-view : () -> Html Msg
+view : M.Model -> Html M.Msg
 view _ =
-    V.view OnSignIn
+    V.view <| M.Auth Model.Auth.StartAuth

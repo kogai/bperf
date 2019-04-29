@@ -1,12 +1,8 @@
 const { Elm } = require("./Main");
-const { AUTH0_DOMAIN, AUTH0_CLIENT_ID } = process.env;
-
-const onAuthComplete = () => {
-  console.log(arguments);
-};
+const { AUTH0_DOMAIN, AUTH0_CLIENT_ID, API_ROOT } = process.env;
 
 const app = Elm.Main.init({
-  flags: onAuthComplete,
+  flags: API_ROOT,
   node: document.getElementById("root")
 });
 
@@ -18,11 +14,11 @@ const webAuth = new auth0.WebAuth({
   redirectUri: `${window.location.protocol}//${window.location.host}/callback`
 });
 
-app.ports.onSignIn.subscribe(() => {
+app.ports.doStartAuth.subscribe(() => {
   webAuth.authorize();
 });
 
-app.ports.onVisitAuthCallback.subscribe(() => {
+app.ports.doVisitAuthCallback.subscribe(() => {
   webAuth.parseHash((err, authResult) => {
     if (err === null && authResult === null) {
       return app.ports.onAuthComplete.send({
