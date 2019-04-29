@@ -15,7 +15,7 @@ import Url
 
 init : () -> Url.Url -> Nav.Key -> ( M.Model, Cmd M.Msg )
 init _ url key =
-    ( M.init url key, Cmd.none )
+    M.init url key
 
 
 update : M.Msg -> M.Model -> ( M.Model, Cmd M.Msg )

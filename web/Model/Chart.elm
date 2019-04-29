@@ -1,4 +1,4 @@
-module Model.Chart exposing (Event, Events, Model(..), Msg(..), init, update)
+module Model.Chart exposing (Event, Events, Model(..), Msg(..), fetchEvents, init, update)
 
 import Http
 import Json.Decode as D exposing (Decoder)
@@ -22,8 +22,7 @@ type Model
 
 
 type Msg
-    = Request
-    | Response (Result Http.Error Events)
+    = Response (Result Http.Error Events)
 
 
 eventDecoder : Decoder Event
@@ -56,6 +55,14 @@ fromHttpError e =
             ""
 
 
+fetchEvents : () -> Cmd Msg
+fetchEvents _ =
+    Http.get
+        { url = "http://localhost:5000/events"
+        , expect = Http.expectJson Response decoder
+        }
+
+
 init : Model
 init =
     Loading
@@ -64,14 +71,6 @@ init =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg _ =
     case msg of
-        Request ->
-            ( Loading
-            , Http.get
-                { url = "http://localhost:5000/events"
-                , expect = Http.expectJson Response decoder
-                }
-            )
-
         Response (Ok xs) ->
             ( Success xs, Cmd.none )
 

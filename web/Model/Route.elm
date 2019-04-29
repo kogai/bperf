@@ -2,7 +2,6 @@ module Model.Route exposing (Model(..), Msg(..), init, update)
 
 import Browser
 import Browser.Navigation as Nav
-import Model.Auth exposing (doVisitAuthCallback)
 import Url
 
 
@@ -66,13 +65,4 @@ update msg model =
                     ( model, Nav.load href )
 
         UrlChanged url ->
-            let
-                cmd =
-                    case url.path of
-                        "/callback" ->
-                            doVisitAuthCallback ()
-
-                        _ ->
-                            Cmd.none
-            in
-            ( init url (keyOf model), cmd )
+            ( init url (keyOf model), Cmd.none )
