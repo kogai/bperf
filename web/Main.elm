@@ -14,7 +14,7 @@ type Model
     = Redirect Nav.Key
     | Dashboard Nav.Key Page.Dashboard.Model
     | SignIn Nav.Key
-    | Auth Nav.Key
+    | Auth Nav.Key Page.Auth.Model
 
 
 keyOf : Model -> Nav.Key
@@ -23,7 +23,7 @@ keyOf model =
         Redirect k ->
             k
 
-        Auth k ->
+        Auth k _ ->
             k
 
         SignIn k ->
@@ -48,10 +48,10 @@ init _ url key =
 
         "/callback" ->
             let
-                ( _, c ) =
+                ( m, c ) =
                     Page.Auth.init
             in
-            ( Auth key, Cmd.map AuthMsg c )
+            ( Auth key m, Cmd.map AuthMsg c )
 
         _ ->
             ( Redirect key, Cmd.none )
@@ -60,8 +60,8 @@ init _ url key =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     case model of
-        Auth _ ->
-            Sub.batch [ Page.Auth.onAuthComplete (\v -> AuthMsg <| Page.Auth.AuthComplete v) ]
+        Auth _ _ ->
+            Sub.batch [ Page.Auth.onAuthComplete (\v -> AuthMsg <| Page.Auth.OnAuth v) ]
 
         _ ->
             Sub.none
@@ -111,13 +111,13 @@ update msg model =
             , Cmd.map SignInMsg subCmd
             )
 
-        ( AuthMsg subMsg, Auth k ) ->
+        ( AuthMsg subMsg, Auth k m ) ->
             let
-                ( _, subCmd ) =
-                    Page.Auth.update subMsg ()
+                nextModel =
+                    Page.Auth.update subMsg m
             in
-            ( Auth k
-            , Cmd.map AuthMsg subCmd
+            ( Auth k nextModel
+            , Cmd.none
             )
 
         _ ->
@@ -139,8 +139,8 @@ view model =
                 [ Html.map SignInMsg <| Page.SignIn.view ()
                 ]
 
-            Auth _ ->
-                [ Html.map AuthMsg <| Page.Auth.view ()
+            Auth _ m ->
+                [ Html.map AuthMsg <| Page.Auth.view m
                 ]
 
             Redirect _ ->

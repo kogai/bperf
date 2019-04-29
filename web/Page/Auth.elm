@@ -1,6 +1,6 @@
-port module Page.Auth exposing (Msg(..), init, onAuthComplete, update, view)
+port module Page.Auth exposing (Model(..), Msg(..), init, onAuthComplete, update, view)
 
-import Html exposing (Html, text)
+import Html exposing (Html, div, text)
 import Json.Decode as D exposing (Decoder, int, oneOf, string)
 import Json.Decode.Pipeline exposing (required)
 import Json.Encode as E
@@ -47,16 +47,15 @@ decodeSuccess =
 decode : D.Value -> AuthPayload
 decode v =
     let
-        decoded =
+        decoder =
             D.decodeValue
                 (oneOf
                     [ decodeError |> D.map Err
                     , decodeSuccess |> D.map Ok
                     ]
                 )
-                v
     in
-    case decoded of
+    case decoder v of
         Err reason ->
             Err (AuthError "decode error" (D.errorToString reason))
 
@@ -64,19 +63,21 @@ decode v =
             result
 
 
-type alias Model =
-    ()
-
-
-type Msg
-    = AuthComplete E.Value
+type Model
+    = Attempt
     | Success AuthSuccess
     | Failure AuthError
 
 
+type Msg
+    = OnAuth E.Value
+    | OnSuccess AuthSuccess
+    | OnFailure AuthError
+
+
 init : ( Model, Cmd Msg )
 init =
-    ( ()
+    ( Attempt
     , onVisitAuthCallback ()
     )
 
@@ -84,21 +85,33 @@ init =
 update : Msg -> Model -> Model
 update msg _ =
     case msg of
-        AuthComplete v ->
+        OnAuth v ->
             case decode v of
                 Ok x ->
-                    -- ( (), Success x )
-                    ()
+                    Success x
 
                 Err x ->
-                    -- ( (), Cmd.none )
-                    ()
+                    Failure x
 
         _ ->
-            -- ( (), )
-            ()
+            Attempt
 
 
 view : Model -> Html Msg
-view _ =
-    text "Auth completed."
+view model =
+    case model of
+        Attempt ->
+            text "Authorization process has been started."
+
+        Success { accessToken, expiresIn, idToken } ->
+            div []
+                [ div []
+                    [ text "Authorization process has been successed."
+                    ]
+                , div []
+                    [ text <| "accessToken:" ++ accessToken ++ " idToken:" ++ idToken ++ " expiresIn:" ++ String.fromInt expiresIn
+                    ]
+                ]
+
+        Failure { errorDescription } ->
+            text errorDescription

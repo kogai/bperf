@@ -10,17 +10,12 @@ const app = Elm.Main.init({
   node: document.getElementById("root")
 });
 
-console.log(onAuthComplete);
-console.log(app.ports);
-
 const webAuth = new auth0.WebAuth({
   domain: AUTH0_DOMAIN,
   clientID: AUTH0_CLIENT_ID,
   responseType: "token id_token",
   scope: "openid",
-  redirectUri: `${window.location.protocol}//${
-    window.location.host
-  }/auth/callback`
+  redirectUri: `${window.location.protocol}//${window.location.host}/callback`
 });
 
 app.ports.onSignIn.subscribe(() => {
@@ -39,7 +34,6 @@ app.ports.onVisitAuthCallback.subscribe(() => {
     if (err) {
       return app.ports.onAuthComplete.send(err);
     }
-    console.log(authResult);
     return app.ports.onAuthComplete.send(authResult);
   });
 });
