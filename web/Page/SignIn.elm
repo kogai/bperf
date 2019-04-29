@@ -1,7 +1,6 @@
-module Page.SignIn exposing (Msg, update, view)
+port module Page.SignIn exposing (Msg, update, view)
 
 import Html exposing (Html)
-import Port.WebAuth
 import View.SignIn as V
 
 
@@ -13,11 +12,14 @@ type Msg
     = OnSignIn
 
 
+port onSignIn : () -> Cmd msg
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg _ =
     case msg of
         OnSignIn ->
-            ( (), Port.WebAuth.onSignIn () )
+            ( (), onSignIn () )
 
 
 view : () -> Html Msg
