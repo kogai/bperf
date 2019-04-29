@@ -40,8 +40,8 @@ type Msg
     = GotText (Result Http.Error Events)
 
 
-init : () -> ( Model, Cmd Msg )
-init _ =
+init : ( Model, Cmd Msg )
+init =
     ( Loading
     , Http.get
         { url = "http://localhost:5000/events"

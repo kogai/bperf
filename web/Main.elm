@@ -1,22 +1,39 @@
 module Main exposing (main)
 
 import Browser
-import Browser.Navigation
-import Debug
+import Browser.Navigation as Nav
 import Html exposing (div, text)
+import Page.Auth
 import Page.Dashboard
+import Page.SignIn
 import TypedSvg.Types exposing (AnchorAlignment(..), Transform(..))
 import Url
-import View.SignIn
 
 
 type Model
-    = Redirect Browser.Navigation.Key
-    | Dashboard Browser.Navigation.Key Page.Dashboard.Model
-    | SignIn Browser.Navigation.Key
+    = Redirect Nav.Key
+    | Dashboard Nav.Key Page.Dashboard.Model
+    | SignIn Nav.Key
+    | Auth Nav.Key Page.Auth.Model
 
 
-init : () -> Url.Url -> Browser.Navigation.Key -> ( Model, Cmd Msg )
+keyOf : Model -> Nav.Key
+keyOf model =
+    case model of
+        Redirect k ->
+            k
+
+        Auth k _ ->
+            k
+
+        SignIn k ->
+            k
+
+        Dashboard k _ ->
+            k
+
+
+init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init _ url key =
     case url.path of
         "/sign_in" ->
@@ -25,96 +42,87 @@ init _ url key =
         "/dashboard" ->
             let
                 ( m, c ) =
-                    Page.Dashboard.init ()
+                    Page.Dashboard.init
             in
             ( Dashboard key m, Cmd.map DashboardMsg c )
+
+        "/callback" ->
+            let
+                ( m, c ) =
+                    Page.Auth.init
+            in
+            ( Auth key m, Cmd.map AuthMsg c )
 
         _ ->
             ( Redirect key, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Sub.none
+subscriptions model =
+    case model of
+        Auth _ _ ->
+            Sub.batch [ Page.Auth.onAuthComplete (\v -> AuthMsg <| Page.Auth.OnAuth v) ]
+
+        _ ->
+            Sub.none
 
 
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
     | DashboardMsg Page.Dashboard.Msg
+    | SignInMsg Page.SignIn.Msg
+    | AuthMsg Page.Auth.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
-        LinkClicked urlRequest ->
+    case ( msg, model ) of
+        ( LinkClicked urlRequest, _ ) ->
             case urlRequest of
                 Browser.Internal url ->
                     ( model
-                    , Browser.Navigation.pushUrl
-                        (case model of
-                            Redirect key ->
-                                key
-
-                            Dashboard key _ ->
-                                key
-
-                            SignIn key ->
-                                key
-                        )
+                    , Nav.pushUrl
+                        (keyOf model)
                         (Url.toString url)
                     )
 
                 Browser.External href ->
-                    ( model, Browser.Navigation.load href )
+                    ( model, Nav.load href )
 
-        UrlChanged { path } ->
+        ( UrlChanged url, _ ) ->
+            init () url (keyOf model)
+
+        ( DashboardMsg subMsg, Dashboard k m ) ->
             let
-                key =
-                    case model of
-                        Redirect k ->
-                            k
-
-                        Dashboard k _ ->
-                            k
-
-                        SignIn k ->
-                            k
+                ( subModel, subCmd ) =
+                    Page.Dashboard.update subMsg m
             in
-            case path of
-                "/sign_in" ->
-                    ( SignIn key, Cmd.none )
-
-                "/dashboard" ->
-                    let
-                        ( m, c ) =
-                            Page.Dashboard.init ()
-                    in
-                    ( Dashboard key m, Cmd.map DashboardMsg c )
-
-                _ ->
-                    ( Redirect key
-                    , Cmd.none
-                    )
-
-        DashboardMsg subMsg ->
-            let
-                ( key, subModel ) =
-                    case model of
-                        Dashboard k m ->
-                            ( k, m )
-
-                        _ ->
-                            Debug.todo "Tmp"
-
-                ( next, subCmd ) =
-                    Page.Dashboard.update subMsg subModel
-
-                _ =
-                    Debug.log "on dashboard:next" next
-            in
-            ( Dashboard key next
+            ( Dashboard k subModel
             , Cmd.map DashboardMsg subCmd
+            )
+
+        ( SignInMsg subMsg, SignIn k ) ->
+            let
+                ( _, subCmd ) =
+                    Page.SignIn.update subMsg ()
+            in
+            ( SignIn k
+            , Cmd.map SignInMsg subCmd
+            )
+
+        ( AuthMsg subMsg, Auth k m ) ->
+            let
+                nextModel =
+                    Page.Auth.update subMsg m
+            in
+            ( Auth k nextModel
+            , Cmd.none
+            )
+
+        _ ->
+            ( model
+            , Cmd.none
             )
 
 
@@ -128,7 +136,12 @@ view model =
                 ]
 
             SignIn _ ->
-                [ View.SignIn.view ]
+                [ Html.map SignInMsg <| Page.SignIn.view ()
+                ]
+
+            Auth _ m ->
+                [ Html.map AuthMsg <| Page.Auth.view m
+                ]
 
             Redirect _ ->
                 [ div [] [ text "404 Not found" ]
