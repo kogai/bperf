@@ -1,9 +1,6 @@
-port module Page.Callback exposing (view)
+module Page.Callback exposing (view)
 
 import Html exposing (Html, div, text)
-import Json.Decode as D exposing (Decoder, int, oneOf, string)
-import Json.Decode.Pipeline exposing (required)
-import Json.Encode as E
 import Model as M
 import Model.Auth as A
 

@@ -1,4 +1,4 @@
-port module Page.SignIn exposing (view)
+module Page.SignIn exposing (view)
 
 import Html exposing (Html)
 import Model as M
