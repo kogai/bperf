@@ -1,12 +1,8 @@
 const { Elm } = require("./Main");
-const { AUTH0_DOMAIN, AUTH0_CLIENT_ID } = process.env;
-
-const onAuthComplete = () => {
-  console.log(arguments);
-};
+const { AUTH0_DOMAIN, AUTH0_CLIENT_ID, API_ROOT } = process.env;
 
 const app = Elm.Main.init({
-  flags: onAuthComplete,
+  flags: API_ROOT,
   node: document.getElementById("root")
 });
 

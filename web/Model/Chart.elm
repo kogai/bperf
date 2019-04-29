@@ -1,66 +1,17 @@
-module Model.Chart exposing (Event, Events, Model(..), Msg(..), fetchEvents, init, update)
+module Model.Chart exposing (Model(..), Msg(..), init, update)
 
+import Api.Events as Api
 import Http
-import Json.Decode as D exposing (Decoder)
-import Json.Decode.Pipeline exposing (required)
-
-
-type alias Event =
-    { time : Float
-    , eventType : String
-    }
-
-
-type alias Events =
-    List Event
 
 
 type Model
     = Loading
     | Failure String
-    | Success Events
+    | Success Api.Events
 
 
 type Msg
-    = Response (Result Http.Error Events)
-
-
-eventDecoder : Decoder Event
-eventDecoder =
-    D.succeed Event
-        |> required "time" D.float
-        |> required "eventType" D.string
-
-
-decoder : Decoder (List Event)
-decoder =
-    D.list eventDecoder
-
-
-
--- = BadUrl String
--- | Timeout
--- | NetworkError
--- | BadStatus Int
--- | BadBody String
-{-
-   FIXME: Handle properly
--}
-
-
-fromHttpError : Http.Error -> String
-fromHttpError e =
-    case e of
-        _ ->
-            ""
-
-
-fetchEvents : () -> Cmd Msg
-fetchEvents _ =
-    Http.get
-        { url = "http://localhost:5000/events"
-        , expect = Http.expectJson Response decoder
-        }
+    = Response (Result Http.Error Api.Events)
 
 
 init : Model
@@ -75,4 +26,4 @@ update msg _ =
             ( Success xs, Cmd.none )
 
         Response (Err e) ->
-            ( Failure <| fromHttpError e, Cmd.none )
+            ( Failure <| Api.fromHttpError e, Cmd.none )

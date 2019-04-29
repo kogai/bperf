@@ -13,9 +13,9 @@ import TypedSvg.Types exposing (AnchorAlignment(..), Transform(..))
 import Url
 
 
-init : () -> Url.Url -> Nav.Key -> ( M.Model, Cmd M.Msg )
-init _ url key =
-    M.init url key
+init : M.Flags -> Url.Url -> Nav.Key -> ( M.Model, Cmd M.Msg )
+init apiRoot url key =
+    M.init apiRoot url key
 
 
 update : M.Msg -> M.Model -> ( M.Model, Cmd M.Msg )
@@ -65,7 +65,7 @@ view model =
             }
 
 
-main : Program () M.Model M.Msg
+main : Program M.Flags M.Model M.Msg
 main =
     Browser.application
         { init = init

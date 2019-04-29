@@ -1,5 +1,6 @@
-module Model exposing (Model, Msg(..), init, mapAuth, mapRoute, update)
+module Model exposing (Flags, Model, Msg(..), init, mapAuth, mapRoute, update)
 
+import Api.Events
 import Browser.Navigation as Nav
 import Model.Auth as A
 import Model.Chart as C
@@ -7,10 +8,15 @@ import Model.Route as R
 import Url
 
 
+type alias Flags =
+    String
+
+
 type alias Model =
     { route : R.Model
     , auth : A.Model
     , chart : C.Model
+    , apiRoot : String
     }
 
 
@@ -30,11 +36,11 @@ mapAuth f x =
     Auth <| f x
 
 
-whenUrlChanged : R.Model -> Cmd Msg
-whenUrlChanged model =
-    case model of
+whenUrlChanged : Model -> R.Model -> Cmd Msg
+whenUrlChanged model route =
+    case route of
         R.Dashboard _ ->
-            Cmd.map Chart <| C.fetchEvents ()
+            Cmd.map Chart <| Api.Events.fetchEvents model.apiRoot C.Response
 
         R.Callback _ ->
             Cmd.map Auth <| A.doVisitAuthCallback ()
@@ -43,17 +49,18 @@ whenUrlChanged model =
             Cmd.none
 
 
-init : Url.Url -> Nav.Key -> ( Model, Cmd Msg )
-init url key =
+init : Flags -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
+init apiRoot url key =
     let
-        subModel =
-            R.init url key
+        model =
+            { route = R.init url key
+            , auth = A.init
+            , chart = C.init
+            , apiRoot = apiRoot
+            }
     in
-    ( { route = subModel
-      , auth = A.init
-      , chart = C.init
-      }
-    , whenUrlChanged subModel
+    ( model
+    , whenUrlChanged model model.route
     )
 
 
@@ -82,6 +89,6 @@ update msg model =
             ( { model | route = subModel }
             , Cmd.batch
                 [ Cmd.map Route subCmd
-                , whenUrlChanged subModel
+                , whenUrlChanged model subModel
                 ]
             )
