@@ -27,7 +27,6 @@ type Model
 type Msg
     = StartAuth
     | OnCallback E.Value
-    | OnLoadToken AuthSuccess
 
 
 type alias AuthPayload =
@@ -38,6 +37,12 @@ port doStartAuth : () -> Cmd msg
 
 
 port doVisitAuthCallback : () -> Cmd msg
+
+
+port setSessions : AuthSuccess -> Cmd msg
+
+
+port removeSessions : () -> Cmd msg
 
 
 port onAuthComplete : (E.Value -> msg) -> Sub msg
@@ -93,13 +98,10 @@ update msg _ =
         OnCallback v ->
             case decode v of
                 Ok x ->
-                    ( Success x, Cmd.none )
+                    ( Success x, setSessions x )
 
                 Err x ->
-                    ( Failure x, Cmd.none )
-
-        OnLoadToken x ->
-            ( Success x, Cmd.none )
+                    ( Failure x, removeSessions () )
 
         StartAuth ->
             ( UnAuthorized, doStartAuth () )

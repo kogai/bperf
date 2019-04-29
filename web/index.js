@@ -38,3 +38,11 @@ app.ports.doVisitAuthCallback.subscribe(() => {
     return app.ports.onAuthComplete.send(authResult);
   });
 });
+
+app.ports.setSessions.subscribe(sessions => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
+});
+
+app.ports.removeSessions.subscribe(() => {
+  localStorage.removeItem(STORAGE_KEY);
+});
