@@ -18,11 +18,11 @@ const webAuth = new auth0.WebAuth({
   redirectUri: `${window.location.protocol}//${window.location.host}/callback`
 });
 
-app.ports.onSignIn.subscribe(() => {
+app.ports.doStartAuth.subscribe(() => {
   webAuth.authorize();
 });
 
-app.ports.onVisitAuthCallback.subscribe(() => {
+app.ports.doVisitAuthCallback.subscribe(() => {
   webAuth.parseHash((err, authResult) => {
     if (err === null && authResult === null) {
       return app.ports.onAuthComplete.send({
