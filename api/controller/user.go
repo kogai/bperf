@@ -20,7 +20,7 @@ type UserParams struct {
 type UserInfo struct {
 	Sub           string `json:"sub"`
 	Email         string `json:"email"`
-	EmailVerified string `json:"email_verified"`
+	EmailVerified bool   `json:"email_verified"`
 }
 
 func retrieveOpenID(accessToken string) (string, error) {
@@ -49,12 +49,14 @@ func UserHandler(c *gin.Context) {
 	var params UserParams
 	err := c.BindJSON(&params)
 	if err != nil {
+		fmt.Printf("%v", err)
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 
 	id, err := retrieveOpenID(params.AccessToken)
 	if err != nil {
+		fmt.Printf("%v", err)
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
@@ -62,7 +64,8 @@ func UserHandler(c *gin.Context) {
 	ins := model.User{PlatformID: id, Products: []model.Product{}, Privilege: "admin"}
 	result := db.Create(&ins)
 	if result.Error != nil {
-		c.AbortWithStatus(http.StatusInternalServerError)
+		// User already registered.
+		c.JSON(http.StatusOK, gin.H{})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{})
