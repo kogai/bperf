@@ -1,5 +1,6 @@
 port module Model.Auth exposing (AuthSuccess, Model(..), Msg(..), doVisitAuthCallback, init, onAuthComplete, update)
 
+import Api.User
 import Json.Decode as D exposing (Decoder, int, oneOf, string)
 import Json.Decode.Pipeline exposing (required)
 import Json.Encode as E
@@ -27,6 +28,7 @@ type Model
 type Msg
     = StartAuth
     | OnCallback E.Value
+    | OnCreateUser
 
 
 type alias AuthPayload =
@@ -92,16 +94,24 @@ init auth =
             UnAuthorized
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg _ =
+update : String -> Msg -> Model -> ( Model, Cmd Msg )
+update apiRoot msg model =
     case msg of
         OnCallback v ->
             case decode v of
                 Ok x ->
-                    ( Success x, setSessions x )
+                    ( Success x
+                    , Cmd.batch
+                        [ setSessions x
+                        , Api.User.createUser apiRoot x.accessToken (\_ -> OnCreateUser)
+                        ]
+                    )
 
                 Err x ->
                     ( Failure x, removeSessions () )
 
         StartAuth ->
             ( UnAuthorized, doStartAuth () )
+
+        OnCreateUser ->
+            ( model, Cmd.none )

@@ -81,7 +81,7 @@ update msg model =
         Auth subMsg ->
             let
                 ( subModel, subCmd ) =
-                    A.update subMsg model.auth
+                    A.update model.apiRoot subMsg model.auth
             in
             ( { model | auth = subModel }, Cmd.map Auth subCmd )
 

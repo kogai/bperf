@@ -7,15 +7,16 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/kogai/bperf/api/model"
+	"github.com/kogai/bperf/api/service"
 )
 
 // InitDatabase is not documented.
 func InitDatabase() error {
 	var err error
-	user := ensureEnv("DB_USER", nil)
-	host := ensureEnv("DB_HOST", nil)
-	password := ensureEnv("DB_PASSWORD", nil)
-	dbname := ensureEnv("DB_DATABASE", nil)
+	user := service.EnsureEnv("DB_USER", nil)
+	host := service.EnsureEnv("DB_HOST", nil)
+	password := service.EnsureEnv("DB_PASSWORD", nil)
+	dbname := service.EnsureEnv("DB_DATABASE", nil)
 
 	conn, err := sql.Open("postgres", fmt.Sprintf("host=%s user=%s password=%s sslmode=disable", host, user, password))
 	if err != nil {
@@ -36,10 +37,10 @@ func InitDatabase() error {
 // EstablishConnection is not documented.
 func EstablishConnection() (*gorm.DB, error) {
 	var err error
-	user := ensureEnv("DB_USER", nil)
-	host := ensureEnv("DB_HOST", nil)
-	dbname := ensureEnv("DB_DATABASE", nil)
-	password := ensureEnv("DB_PASSWORD", nil)
+	user := service.EnsureEnv("DB_USER", nil)
+	host := service.EnsureEnv("DB_HOST", nil)
+	dbname := service.EnsureEnv("DB_DATABASE", nil)
+	password := service.EnsureEnv("DB_PASSWORD", nil)
 
 	conn, err := gorm.Open("postgres", fmt.Sprintf("host=%s user=%s dbname=%s password=%s sslmode=disable", host, user, dbname, password))
 	if err != nil {
