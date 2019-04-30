@@ -20,6 +20,8 @@ func JwtMiddleware() gin.HandlerFunc {
 		token, err := validator.ValidateRequest(c.Request)
 		if err != nil {
 			c.AbortWithStatus(http.StatusUnauthorized)
+			c.Next()
+			return
 		}
 		c.Set("token", token)
 		c.Next()

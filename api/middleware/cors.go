@@ -7,10 +7,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// CorsMiddleWare is not documented.
+// CorsMiddleware is not documented.
 func CorsMiddleware() gin.HandlerFunc {
 	return cors.New(cors.Config{
 		AllowAllOrigins:  true,
+		AllowHeaders:     []string{"Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,

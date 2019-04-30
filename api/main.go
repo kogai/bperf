@@ -104,9 +104,7 @@ func main() {
 	// defer conn.Close()
 
 	port := ensureEnv("PORT", "5000")
-	fmt.Printf("API Server has been started at :%s\n", port)
-
-	err = r.Run()
+	err = r.Run(fmt.Sprintf(":%s", port))
 	if err != nil {
 		panic(err)
 	}

@@ -42,7 +42,16 @@ whenUrlChanged : Model -> R.Model -> Cmd Msg
 whenUrlChanged model route =
     case route of
         R.Dashboard _ ->
-            Cmd.map Chart <| Api.Events.fetchEvents model.apiRoot C.Response
+            let
+                msg =
+                    case model.auth of
+                        A.Success { idToken } ->
+                            Api.Events.fetchEvents model.apiRoot idToken C.Response
+
+                        _ ->
+                            Cmd.none
+            in
+            Cmd.map Chart <| msg
 
         R.Callback _ ->
             Cmd.map Auth <| A.doVisitAuthCallback ()

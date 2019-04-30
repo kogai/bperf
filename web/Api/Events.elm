@@ -46,9 +46,17 @@ fromHttpError e =
             "network error"
 
 
-fetchEvents : String -> (Result Http.Error (List Event) -> msg) -> Cmd msg
-fetchEvents apiRoot f =
-    Http.get
+fetchEvents : String -> String -> (Result Http.Error (List Event) -> msg) -> Cmd msg
+fetchEvents apiRoot idToken f =
+    Http.request
         { url = apiRoot ++ "/chart/events"
         , expect = Http.expectJson f decoder
+        , method = "GET"
+        , body = Http.emptyBody
+        , headers =
+            [ Http.header "Accept" "application/json"
+            , Http.header "Authorization" <| "Bearer " ++ idToken
+            ]
+        , timeout = Nothing
+        , tracker = Nothing
         }
