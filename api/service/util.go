@@ -1,11 +1,12 @@
-package middleware
+package service
 
 import (
 	"fmt"
 	"os"
 )
 
-func ensureEnv(name string, defaultValue interface{}) string {
+// EnsureEnv is not documented.
+func EnsureEnv(name string, defaultValue interface{}) string {
 	v := os.Getenv(name)
 
 	if v == "" && nil == defaultValue {
