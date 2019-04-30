@@ -15,7 +15,7 @@ const webAuth = new auth0.WebAuth({
   domain: AUTH0_DOMAIN,
   clientID: AUTH0_CLIENT_ID,
   responseType: "token id_token",
-  scope: "openid",
+  scope: "openid email",
   redirectUri: `${window.location.protocol}//${window.location.host}/callback`
 });
 
