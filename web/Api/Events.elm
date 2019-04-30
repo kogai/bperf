@@ -3,6 +3,7 @@ module Api.Events exposing (Event, Events, decoder, eventDecoder, fetchEvents, f
 import Http exposing (Error(..))
 import Json.Decode as D exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)
+import Url.Builder as B
 
 
 type alias Event =
@@ -49,7 +50,7 @@ fromHttpError e =
 fetchEvents : String -> String -> (Result Http.Error (List Event) -> msg) -> Cmd msg
 fetchEvents apiRoot idToken f =
     Http.request
-        { url = apiRoot ++ "/chart/events"
+        { url = B.crossOrigin apiRoot [ "chart", "events" ] []
         , expect = Http.expectJson f decoder
         , method = "GET"
         , body = Http.emptyBody
