@@ -41,6 +41,7 @@ func setRouter() (*gin.Engine, error) {
 
 	r.GET("/beacon", controller.BeaconHandler)
 	r.GET("/close", controller.CloseHandler)
+	r.POST("/user", controller.UserHandler)
 
 	chart := r.Group("/chart")
 	chart.Use(middleware.JwtMiddleware())
