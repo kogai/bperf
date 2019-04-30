@@ -1,4 +1,4 @@
-port module Model.Auth exposing (Model(..), Msg(..), doVisitAuthCallback, init, onAuthComplete, update)
+port module Model.Auth exposing (AuthSuccess, Model(..), Msg(..), doVisitAuthCallback, init, onAuthComplete, update)
 
 import Json.Decode as D exposing (Decoder, int, oneOf, string)
 import Json.Decode.Pipeline exposing (required)
@@ -27,7 +27,6 @@ type Model
 type Msg
     = StartAuth
     | OnCallback E.Value
-    | OnLoadToken AuthSuccess
 
 
 type alias AuthPayload =
@@ -38,6 +37,12 @@ port doStartAuth : () -> Cmd msg
 
 
 port doVisitAuthCallback : () -> Cmd msg
+
+
+port setSessions : AuthSuccess -> Cmd msg
+
+
+port removeSessions : () -> Cmd msg
 
 
 port onAuthComplete : (E.Value -> msg) -> Sub msg
@@ -77,9 +82,14 @@ decode v =
             result
 
 
-init : Model
-init =
-    UnAuthorized
+init : Maybe AuthSuccess -> Model
+init auth =
+    case auth of
+        Just x ->
+            Success x
+
+        Nothing ->
+            UnAuthorized
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -88,13 +98,10 @@ update msg _ =
         OnCallback v ->
             case decode v of
                 Ok x ->
-                    ( Success x, Cmd.none )
+                    ( Success x, setSessions x )
 
                 Err x ->
-                    ( Failure x, Cmd.none )
-
-        OnLoadToken x ->
-            ( Success x, Cmd.none )
+                    ( Failure x, removeSessions () )
 
         StartAuth ->
             ( UnAuthorized, doStartAuth () )

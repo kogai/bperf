@@ -14,8 +14,8 @@ import Url
 
 
 init : M.Flags -> Url.Url -> Nav.Key -> ( M.Model, Cmd M.Msg )
-init apiRoot url key =
-    M.init apiRoot url key
+init flags url key =
+    M.init flags url key
 
 
 update : M.Msg -> M.Model -> ( M.Model, Cmd M.Msg )

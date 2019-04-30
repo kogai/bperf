@@ -3,6 +3,7 @@ module Api.Events exposing (Event, Events, decoder, eventDecoder, fetchEvents, f
 import Http exposing (Error(..))
 import Json.Decode as D exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)
+import Url.Builder as B
 
 
 type alias Event =
@@ -46,9 +47,17 @@ fromHttpError e =
             "network error"
 
 
-fetchEvents : String -> (Result Http.Error (List Event) -> msg) -> Cmd msg
-fetchEvents apiRoot f =
-    Http.get
-        { url = apiRoot ++ "/events"
+fetchEvents : String -> String -> (Result Http.Error (List Event) -> msg) -> Cmd msg
+fetchEvents apiRoot idToken f =
+    Http.request
+        { url = B.crossOrigin apiRoot [ "chart", "events" ] []
         , expect = Http.expectJson f decoder
+        , method = "GET"
+        , body = Http.emptyBody
+        , headers =
+            [ Http.header "Accept" "application/json"
+            , Http.header "Authorization" <| "Bearer " ++ idToken
+            ]
+        , timeout = Nothing
+        , tracker = Nothing
         }

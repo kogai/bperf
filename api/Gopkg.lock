@@ -2,6 +2,14 @@
 
 
 [[projects]]
+  digest = "1:b7453dcd64035c500930e3852a9324cfd92d2f379fface77361a4ba4cd3ada18"
+  name = "github.com/auth0-community/go-auth0"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "ddfdc88aaa5909a3d4e3ad0543a27f4a63a691e6"
+  version = "v1.0.0"
+
+[[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
@@ -136,6 +144,18 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:b8fa1ff0fc20983395978b3f771bb10438accbfe19326b02e236c1d4bf1c91b2"
+  name = "golang.org/x/crypto"
+  packages = [
+    "ed25519",
+    "ed25519/internal/edwards25519",
+    "pbkdf2",
+  ]
+  pruneopts = "UT"
+  revision = "a29dc8fdc73485234dbef99ebedb95d2eced08de"
+
+[[projects]]
+  branch = "master"
   digest = "1:55565b142e38b7d00c39ce9a86fc70bbfa37c4f2f00d8ff2343f433c351db8e3"
   name = "golang.org/x/sys"
   packages = ["unix"]
@@ -151,6 +171,19 @@
   version = "v8.18.2"
 
 [[projects]]
+  digest = "1:9593bab40e981b1f90b7e07faeab0d09b75fe338880d08880f986a9d3283c53f"
+  name = "gopkg.in/square/go-jose.v2"
+  packages = [
+    ".",
+    "cipher",
+    "json",
+    "jwt",
+  ]
+  pruneopts = "UT"
+  revision = "730df5f748271903322feb182be83b43ebbbe27d"
+  version = "v2.3.1"
+
+[[projects]]
   digest = "1:4d2e5a73dc1500038e504a8d78b986630e3626dc027bc030ba5c75da257cdb96"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
@@ -162,11 +195,13 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/auth0-community/go-auth0",
     "github.com/gin-contrib/cors",
     "github.com/gin-gonic/gin",
     "github.com/jinzhu/gorm",
     "github.com/jinzhu/gorm/dialects/postgres",
     "github.com/stretchr/testify/assert",
+    "gopkg.in/square/go-jose.v2",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

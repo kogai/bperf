@@ -1,73 +1,19 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"net/http"
 	"os"
 	"strconv"
-	"time"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/kogai/bperf/api/middleware"
 	"github.com/kogai/bperf/api/model"
 )
 
-func initDatabase() error {
-	var err error
-	user := ensureEnv("DB_USER", nil)
-	host := ensureEnv("DB_HOST", nil)
-	password := ensureEnv("DB_PASSWORD", nil)
-	dbname := ensureEnv("DB_DATABASE", nil)
-
-	conn, err := sql.Open("postgres", fmt.Sprintf("host=%s user=%s password=%s sslmode=disable", host, user, password))
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
-
-	_, err = conn.Exec(fmt.Sprintf("create database %s;", dbname))
-	if err != nil {
-		if err.Error() == fmt.Sprintf("pq: database \"%s\" already exists", dbname) {
-			return nil
-		}
-		return err
-	}
-	return nil
-}
-
-func establishConnection() (*gorm.DB, error) {
-	var err error
-	user := ensureEnv("DB_USER", nil)
-	host := ensureEnv("DB_HOST", nil)
-	dbname := ensureEnv("DB_DATABASE", nil)
-	password := ensureEnv("DB_PASSWORD", nil)
-
-	conn, err := gorm.Open("postgres", fmt.Sprintf("host=%s user=%s dbname=%s password=%s sslmode=disable", host, user, dbname, password))
-	if err != nil {
-		return nil, err
-	}
-
-	_ = conn.Exec("CREATE TYPE price_plan AS ENUM ('free', 'developer', 'enterprise');")
-	_ = conn.Exec("CREATE TYPE event_type AS ENUM ('childList', 'attributes', 'characterData');")
-	_ = conn.Exec("CREATE TYPE render_duration_event AS ENUM ('frame', 'paint');")
-	_ = conn.Exec("CREATE TYPE privilege AS ENUM ('admin', 'developer', 'observer');")
-
-	conn.AutoMigrate(&model.MemoryUsage{})
-	conn.AutoMigrate(&model.MonitoringTarget{})
-	conn.AutoMigrate(&model.NetworkEvent{})
-	conn.AutoMigrate(&model.Product{})
-	conn.AutoMigrate(&model.RenderEvent{})
-	conn.AutoMigrate(&model.RenderDuration{})
-	conn.AutoMigrate(&model.Session{})
-	conn.AutoMigrate(&model.UaOs{})
-	conn.AutoMigrate(&model.User{})
-	conn.LogMode(true)
-
-	return conn, err
-}
+var identityKey = "id"
 
 func beaconHandler(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
@@ -122,38 +68,30 @@ func ensureEnv(name string, defaultValue interface{}) string {
 	return v
 }
 
-func dbMiddleWare(db *gorm.DB) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Set("db", db)
-		c.Next()
-	}
-}
-
 func setRouter() (*gin.Engine, error) {
 	var err error
 	r := gin.Default()
-	err = initDatabase()
+	err = middleware.InitDatabase()
 	if err != nil {
 		return nil, err
 	}
-	conn, err := establishConnection()
+	conn, err := middleware.EstablishConnection()
 	if err != nil {
 		return nil, err
 	}
 
-	r.Use(dbMiddleWare(conn))
-	r.Use(cors.New(cors.Config{
-		AllowAllOrigins:  true,
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
-	}))
+	r.Use(middleware.DbMiddleware(conn))
+	r.Use(middleware.CorsMiddleware())
 
-	r.GET("/events", eventsHandler)
 	r.GET("/beacon", beaconHandler)
 	r.GET("/close", func(c *gin.Context) {
 		fmt.Printf("on close event occurred.\n")
 	})
+
+	chart := r.Group("/chart")
+	chart.Use(middleware.JwtMiddleware())
+	chart.GET("/events", eventsHandler)
+
 	return r, nil
 }
 
@@ -166,8 +104,7 @@ func main() {
 	// defer conn.Close()
 
 	port := ensureEnv("PORT", "5000")
-	fmt.Printf("API Server has been started at :%s\n", port)
-	err = r.Run()
+	err = r.Run(fmt.Sprintf(":%s", port))
 	if err != nil {
 		panic(err)
 	}
