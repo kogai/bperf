@@ -49,6 +49,6 @@ fromHttpError e =
 fetchEvents : String -> (Result Http.Error (List Event) -> msg) -> Cmd msg
 fetchEvents apiRoot f =
     Http.get
-        { url = apiRoot ++ "/events"
+        { url = apiRoot ++ "/chart/events"
         , expect = Http.expectJson f decoder
         }

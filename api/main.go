@@ -8,12 +8,16 @@ import (
 	"strconv"
 	"time"
 
+	auth0 "github.com/auth0-community/go-auth0"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/kogai/bperf/api/model"
+	"gopkg.in/square/go-jose.v2"
 )
+
+var identityKey = "id"
 
 func initDatabase() error {
 	var err error
@@ -149,11 +153,33 @@ func setRouter() (*gin.Engine, error) {
 		MaxAge:           12 * time.Hour,
 	}))
 
-	r.GET("/events", eventsHandler)
 	r.GET("/beacon", beaconHandler)
 	r.GET("/close", func(c *gin.Context) {
 		fmt.Printf("on close event occurred.\n")
 	})
+	chart := r.Group("/chart")
+
+	client := auth0.NewJWKClient(auth0.JWKClientOptions{URI: fmt.Sprintf("https://%s/.well-known/jwks.json", ensureEnv("AUTH0_DOMAIN", nil))}, nil)
+	audience := ensureEnv("AUTH0_CLIENT_ID", nil)
+	configuration := auth0.NewConfiguration(client, []string{audience}, fmt.Sprintf("https://%s/", ensureEnv("AUTH0_DOMAIN", nil)), jose.RS256)
+	validator := auth0.NewValidator(configuration, nil)
+
+	fmt.Printf("%v", configuration)
+	fmt.Printf("%v", audience)
+
+	chart.Use(func(c *gin.Context) {
+		token, err := validator.ValidateRequest(c.Request)
+
+		fmt.Printf("token:%v\n", token)
+		fmt.Printf("err:%v\n", err)
+		if err != nil {
+			c.AbortWithStatus(http.StatusUnauthorized)
+		}
+		c.Set("token", token)
+		c.Next()
+	})
+	chart.GET("/events", eventsHandler)
+
 	return r, nil
 }
 
@@ -167,6 +193,7 @@ func main() {
 
 	port := ensureEnv("PORT", "5000")
 	fmt.Printf("API Server has been started at :%s\n", port)
+
 	err = r.Run()
 	if err != nil {
 		panic(err)
