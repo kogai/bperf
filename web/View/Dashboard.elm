@@ -1,6 +1,6 @@
 module View.Dashboard exposing (Props(..), view)
 
-import Html exposing (div, text)
+import Html exposing (Html, div, text)
 import Html.Attributes exposing (class)
 import TypedSvg.Attributes exposing (class)
 import TypedSvg.Core exposing (Svg)
@@ -15,6 +15,16 @@ type Props
     | Success (List Float)
 
 
+panel : Html msg -> Html msg
+panel x =
+    div [ class [ "panel" ] ]
+        [ div [ class [ "panel-heading" ] ] [ text "rendering events" ]
+        , div
+            [ class [ "panel-block" ] ]
+            [ x ]
+        ]
+
+
 view : Props -> Svg msg
 view props =
     Layout.view <|
@@ -26,7 +36,6 @@ view props =
                 text "Unable to load events"
 
             Success events ->
-                div [ class [ "tile", "is-ancestor" ] ]
-                    [ div [ class [ "tile", "is-parent", "is-4" ] ]
-                        [ Histogram.view events ]
+                div []
+                    [ panel <| Histogram.view events
                     ]

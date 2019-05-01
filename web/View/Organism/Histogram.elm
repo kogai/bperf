@@ -119,19 +119,12 @@ view props =
         bins =
             histogram props
     in
-    div [ class [ "panel" ] ]
-        [ div [ class [ "panel-heading" ] ] [ text "rendering events" ]
-        , div
-            [ class [ "panel-block" ]
-            ]
-            [ svg
-                [ width w, height h ]
-                [ g [ transform [ Translate (padding - 1) (h - padding) ] ]
-                    [ xAxis props ]
-                , g [ transform [ Translate (padding - 1) padding ] ]
-                    [ yAxis bins ]
-                , g [ transform [ Translate padding padding ], class [ "series" ] ] <|
-                    List.map (column props (yScaleFromBins bins)) bins
-                ]
-            ]
+    svg
+        [ width w, height h ]
+        [ g [ transform [ Translate (padding - 1) (h - padding) ] ]
+            [ xAxis props ]
+        , g [ transform [ Translate (padding - 1) padding ] ]
+            [ yAxis bins ]
+        , g [ transform [ Translate padding padding ], class [ "series" ] ] <|
+            List.map (column props (yScaleFromBins bins)) bins
         ]
