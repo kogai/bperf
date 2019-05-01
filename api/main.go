@@ -6,8 +6,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-	"github.com/kogai/bperf/api/controller"
-	"github.com/kogai/bperf/api/middleware"
+	c "github.com/kogai/bperf/api/controller"
+	m "github.com/kogai/bperf/api/middleware"
 )
 
 var identityKey = "id"
@@ -27,25 +27,27 @@ func ensureEnv(name string, defaultValue interface{}) string {
 func setRouter() (*gin.Engine, error) {
 	var err error
 	r := gin.Default()
-	err = middleware.InitDatabase()
+	err = m.InitDatabase()
 	if err != nil {
 		return nil, err
 	}
-	conn, err := middleware.EstablishConnection()
+	conn, err := m.EstablishConnection()
 	if err != nil {
 		return nil, err
 	}
 
-	r.Use(middleware.DbMiddleware(conn))
-	r.Use(middleware.CorsMiddleware())
+	r.Use(m.DbMiddleware(conn))
+	r.Use(m.CorsMiddleware())
 
-	r.GET("/beacon", controller.BeaconHandler)
-	r.GET("/close", controller.CloseHandler)
-	r.POST("/user", controller.UserHandler)
+	r.GET("/beacon", c.BeaconHandler)
+	r.GET("/close", c.CloseHandler)
+	r.POST("/user", c.UserHandler)
 
+	// Authenticated only
 	chart := r.Group("/chart")
-	chart.Use(middleware.JwtMiddleware())
-	chart.GET("/events", controller.EventsHandler)
+	chart.Use(m.JwtMiddleware())
+	chart.GET("/events", c.EventsHandler)
+	chart.GET("/durations", c.DurationsHandler)
 
 	return r, nil
 }

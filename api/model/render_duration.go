@@ -9,11 +9,15 @@ import (
 type RenderDurationEvent string
 
 const (
-	Frame     RenderDurationEvent = "frame"
-	Paint     RenderDurationEvent = "paint"
+	// Frame is not documented.
+	Frame RenderDurationEvent = "frame"
+	// Paint is not documented.
+	Paint RenderDurationEvent = "paint"
+	// UnknownRd is not documented.
 	UnknownRd RenderDurationEvent = "unknown"
 )
 
+// ToRenderDurationType is not documented.
 func ToRenderDurationType(s string) (RenderDurationEvent, error) {
 	switch s {
 	case "frame":
@@ -43,4 +47,13 @@ type RenderDuration struct {
 // ToJSON is converter from Database model to JSON
 func (r *RenderDuration) ToJSON() RenderDurationJSON {
 	return RenderDurationJSON{EventType: r.EventType, StartTime: r.StartTime, EndTime: r.EndTime}
+}
+
+// RenderDurationJSONArray is not documented.
+func RenderDurationJSONArray(events []RenderDuration) []RenderDurationJSON {
+	var payloads = make([]RenderDurationJSON, 0)
+	for _, e := range events {
+		payloads = append(payloads, e.ToJSON())
+	}
+	return payloads
 }
