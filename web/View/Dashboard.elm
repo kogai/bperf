@@ -16,6 +16,7 @@ type Props
     | Success
         { events : List Float
         , durations : List ( Float, Float )
+        , networks : List ( Float, Float )
         }
 
 
@@ -39,8 +40,8 @@ view props =
             Failure ->
                 text "Unable to load events"
 
-            Success { events } ->
+            Success { events, networks } ->
                 div []
-                    [ panel <| Resource.view [ ( 10, 20 ) ]
+                    [ panel <| Resource.view networks
                     , panel <| Histogram.view events
                     ]

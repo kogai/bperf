@@ -48,6 +48,7 @@ func setRouter() (*gin.Engine, error) {
 	chart.Use(m.JwtMiddleware())
 	chart.GET("/events", c.EventsHandler)
 	chart.GET("/durations", c.DurationsHandler)
+	chart.GET("/networks", c.NetworksHandler)
 
 	return r, nil
 }

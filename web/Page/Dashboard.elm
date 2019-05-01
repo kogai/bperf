@@ -14,13 +14,16 @@ view model =
             C.Failure _ ->
                 V.Failure
 
-            C.Success { events, durations } ->
+            C.Success { events, durations, networks } ->
                 V.Success
                     { events =
                         events
                             |> List.map (\x -> x.time)
                     , durations =
                         durations
+                            |> List.map (\x -> ( x.startTime, x.endTime ))
+                    , networks =
+                        networks
                             |> List.map (\x -> ( x.startTime, x.endTime ))
                     }
 

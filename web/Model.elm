@@ -2,6 +2,7 @@ module Model exposing (Flags, Model, Msg(..), init, mapAuth, mapRoute, update)
 
 import Api.Durations
 import Api.Events
+import Api.Networks
 import Browser.Navigation as Nav
 import Model.Auth as A
 import Model.Chart as C
@@ -50,6 +51,7 @@ whenUrlChanged model route =
                             Cmd.batch
                                 [ Api.Events.fetch model.apiRoot idToken C.EventsMsg
                                 , Api.Durations.fetch model.apiRoot idToken C.DurationsMsg
+                                , Api.Networks.fetch model.apiRoot idToken C.NetworkMsg
                                 ]
 
                         _ ->

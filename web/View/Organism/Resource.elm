@@ -28,11 +28,15 @@ import TypedSvg.Types exposing (Fill(..), Transform(..))
 
 
 type alias Props =
-    List ( Int, Int )
+    List ( Float, Float )
 
 
 view : Props -> Svg msg
-view _ =
+view durations =
+    -- let
+    --     _ =
+    --         Debug.log "durations" durations
+    -- in
     svg
         [ width 100, height 100 ]
         [ g []
