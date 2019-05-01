@@ -19,10 +19,10 @@ type Props
         }
 
 
-panel : Html msg -> Html msg
-panel x =
+panel : String -> Html msg -> Html msg
+panel title x =
     div [ class "panel" ]
-        [ div [ class "panel-heading" ] [ text "rendering events" ]
+        [ div [ class "panel-heading" ] [ text title ]
         , div
             [ class "panel-block" ]
             [ x ]
@@ -41,6 +41,6 @@ view props =
 
             Success { events, networks } ->
                 div []
-                    [ panel <| Resource.view networks
-                    , panel <| Histogram.view events
+                    [ panel "network" <| Resource.view networks
+                    , panel "rendering" <| Histogram.view events
                     ]

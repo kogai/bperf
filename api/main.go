@@ -2,27 +2,13 @@ package main
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	c "github.com/kogai/bperf/api/controller"
 	m "github.com/kogai/bperf/api/middleware"
+	s "github.com/kogai/bperf/api/service"
 )
-
-var identityKey = "id"
-
-func ensureEnv(name string, defaultValue interface{}) string {
-	v := os.Getenv(name)
-
-	if v == "" && nil == defaultValue {
-		panic(fmt.Sprintf("An environment variable [%s] must be defined.", name))
-	}
-	if v == "" && nil != defaultValue {
-		return defaultValue.(string)
-	}
-	return v
-}
 
 func setRouter() (*gin.Engine, error) {
 	var err error
@@ -61,7 +47,7 @@ func main() {
 	}
 	// defer conn.Close()
 
-	port := ensureEnv("PORT", "5000")
+	port := s.EnsureEnv("PORT", "5000")
 	err = r.Run(fmt.Sprintf(":%s", port))
 	if err != nil {
 		panic(err)

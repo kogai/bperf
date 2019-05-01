@@ -39,7 +39,7 @@ type RenderDurationJSON struct {
 
 // RenderDuration is not documented.
 type RenderDuration struct {
-	Session   Session             `gorm:"not null"`
+	SessionID string              `gorm:"not null"`
 	EventType RenderDurationEvent `gorm:"not null"  sql:"type:render_duration_event"`
 	StartTime int64               `gorm:"not null"`
 	EndTime   int64               `gorm:"not null"`

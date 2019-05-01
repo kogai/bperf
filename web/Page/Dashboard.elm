@@ -24,8 +24,6 @@ view model =
                             |> List.map (\x -> ( x.startTime, x.endTime ))
                     , networks =
                         networks
-
-                    -- |> List.map (\x -> ( x.startTime, x.endTime ))
                     }
 
             _ ->
