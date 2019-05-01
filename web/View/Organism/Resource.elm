@@ -1,13 +1,8 @@
 module View.Organism.Resource exposing (view)
 
--- import Axis
--- import Histogram exposing (Bin, HistogramGenerator, Threshold, binCount)
--- import Html exposing (div, text)
--- import Scale exposing (ContinuousScale)
--- import Time exposing (toHour, toMinute, utc)
--- import Html.Attributes exposing (class)
-
 import Color
+import Scale exposing (BandScale, ContinuousScale, defaultBandConfig)
+import Time
 import TypedSvg exposing (g, rect, svg)
 import TypedSvg.Attributes exposing (fill)
 import TypedSvg.Attributes.InPx exposing (height, width, x, y)
@@ -15,16 +10,67 @@ import TypedSvg.Core exposing (Svg)
 import TypedSvg.Types exposing (Fill(..), Transform(..))
 
 
+w : Float
+w =
+    700
 
--- w : Float
--- w =
---     400
--- h : Float
--- h =
---     250
--- padding : Float
--- padding =
---     30
+
+h : Float
+h =
+    300
+
+
+padding : Float
+padding =
+    30
+
+
+
+-- xAxis : List ( Time.Posix, Float ) -> Svg msg
+-- xAxis model =
+--     Axis.bottom [] (Scale.toRenderable dateFormat (xScale model))
+-- yAxis : Svg msg
+-- yAxis =
+--     Axis.left [ Axis.tickCount 5 ] yScale
+
+
+yScale : List ( Time.Posix, Float ) -> BandScale Time.Posix
+yScale model =
+    List.map Tuple.first model
+        |> Scale.band { defaultBandConfig | paddingInner = 0.1, paddingOuter = 0.1 } ( 0, h - 2 * padding )
+
+
+{-| Scale.linear : outputRange -> inputRange -> Scale
+
+
+    scale_ =
+        Scale.linear ( 50, 100 ) ( 0, 1 )
+
+    --> 75
+
+-}
+xScale : ContinuousScale Float
+xScale =
+    Scale.linear ( 0, w ) ( 0, 3000 )
+
+
+yyScale : ContinuousScale Float
+yyScale =
+    Scale.linear ( 0, h ) ( 0, 50 )
+
+
+column : BandScale Time.Posix -> Int -> ( Time.Posix, Float ) -> Svg msg
+column scale idx ( date, value ) =
+    g []
+        [ rect
+            [ x <| Scale.convert scale date
+            , y <| Scale.convert yyScale (toFloat idx)
+            , height <| Scale.bandwidth scale
+            , width <| Scale.convert xScale value
+            , fill <| Fill <| Color.rgb255 46 118 149
+            ]
+            []
+        ]
 
 
 type alias Props =
@@ -32,34 +78,15 @@ type alias Props =
 
 
 view : Props -> Svg msg
-view durations_ =
+view networks_ =
     let
-        _ =
-            List.take 50 durations_
-
-        -- _ =
-        --     Debug.log "durations" durations
+        networks =
+            networks_
+                |> List.take 50
+                |> List.map (\( s, e ) -> ( s, e - s ))
+                |> List.map (Tuple.mapFirst round)
+                |> List.map (Tuple.mapFirst Time.millisToPosix)
     in
     svg
-        [ width 100, height 100 ]
-        [ g []
-            [ rect
-                [ x 0
-                , y 0
-                , width 30
-                , height 2
-                , fill <| Fill <| Color.rgb255 46 118 149
-                ]
-                []
-            ]
-        , g []
-            [ rect
-                [ x 10
-                , y 2
-                , width 30
-                , height 2
-                , fill <| Fill <| Color.rgb255 46 118 149
-                ]
-                []
-            ]
-        ]
+        [ width w, height h ]
+        (List.indexedMap (column (yScale networks)) networks)
