@@ -3,10 +3,10 @@ module View.Organism.Resource exposing (view)
 import Color
 import Scale exposing (BandScale, ContinuousScale, defaultBandConfig)
 import Time
-import TypedSvg exposing (g, rect, svg)
-import TypedSvg.Attributes exposing (fill)
+import TypedSvg exposing (g, rect, style, svg, text_)
+import TypedSvg.Attributes exposing (class, fill)
 import TypedSvg.Attributes.InPx exposing (height, width, x, y)
-import TypedSvg.Core exposing (Svg)
+import TypedSvg.Core exposing (Svg, text)
 import TypedSvg.Types exposing (Fill(..), Transform(..))
 
 
@@ -23,15 +23,6 @@ h =
 padding : Float
 padding =
     30
-
-
-
--- xAxis : List ( Time.Posix, Float ) -> Svg msg
--- xAxis model =
---     Axis.bottom [] (Scale.toRenderable dateFormat (xScale model))
--- yAxis : Svg msg
--- yAxis =
---     Axis.left [ Axis.tickCount 5 ] yScale
 
 
 yScale : List ( Time.Posix, Float ) -> BandScale Time.Posix
@@ -59,22 +50,40 @@ yyScale len =
     Scale.linear ( 0, h ) ( 0, toFloat len )
 
 
-column : Int -> BandScale Time.Posix -> Int -> ( Time.Posix, Float ) -> Svg msg
-column len scale idx ( date, value ) =
-    g []
+column :
+    Int
+    -> BandScale Time.Posix
+    -> Int
+    ->
+        { name : String
+        , startTime : Time.Posix
+        , duration : Float
+        }
+    -> Svg msg
+column len scale idx { startTime, duration, name } =
+    g [ class [ "column" ] ]
         [ rect
-            [ x <| Scale.convert scale date
+            [ x <| Scale.convert scale startTime
             , y <| Scale.convert (yyScale len) (toFloat idx)
             , height <| Scale.bandwidth scale
-            , width <| Scale.convert xScale value
+            , width <| Scale.convert xScale duration
             , fill <| Fill <| Color.rgb255 46 118 149
             ]
             []
+        , text_
+            [ x <| Scale.convert scale startTime
+            , y <| Scale.convert (yyScale len) (toFloat idx)
+            ]
+            [ text name ]
         ]
 
 
 type alias Props =
-    List ( Float, Float )
+    List
+        { name : String
+        , startTime : Float
+        , endTime : Float
+        }
 
 
 view : Props -> Svg msg
@@ -83,10 +92,15 @@ view networks_ =
         networks =
             networks_
                 |> List.take 50
-                |> List.map (\( s, e ) -> ( s, e - s ))
-                |> List.map (Tuple.mapFirst round)
-                |> List.map (Tuple.mapFirst Time.millisToPosix)
+                |> List.map (\{ startTime, endTime, name } -> { startTime = startTime, name = name, duration = endTime - startTime })
+                |> List.map (\{ startTime, duration, name } -> { duration = duration, name = name, startTime = round startTime })
+                |> List.map (\{ startTime, duration, name } -> { duration = duration, name = name, startTime = Time.millisToPosix startTime })
     in
     svg
         [ width w, height h ]
-        (List.indexedMap (column (List.length networks) (yScale networks)) networks)
+        [ style [] [ text """
+            .column text { display: none; }
+            .column:hover text { display: inline; }
+          """ ]
+        , g [] <| List.indexedMap (column (List.length networks) (yScale <| List.map (\{ startTime, duration } -> ( startTime, duration )) networks)) networks
+        ]

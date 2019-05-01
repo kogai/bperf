@@ -9,6 +9,7 @@ import Url.Builder as B
 type alias Network =
     { startTime : Float
     , endTime : Float
+    , name : String
     }
 
 
@@ -22,6 +23,7 @@ decoder =
         (D.succeed Network
             |> required "startTime" D.float
             |> required "endTime" D.float
+            |> required "name" D.string
         )
 
 

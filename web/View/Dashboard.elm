@@ -15,7 +15,7 @@ type Props
     | Success
         { events : List Float
         , durations : List ( Float, Float )
-        , networks : List ( Float, Float )
+        , networks : List { name : String, startTime : Float, endTime : Float }
         }
 
 
