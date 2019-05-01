@@ -54,17 +54,17 @@ xScale =
     Scale.linear ( 0, w ) ( 0, 3000 )
 
 
-yyScale : ContinuousScale Float
-yyScale =
-    Scale.linear ( 0, h ) ( 0, 50 )
+yyScale : Int -> ContinuousScale Float
+yyScale len =
+    Scale.linear ( 0, h ) ( 0, toFloat len )
 
 
-column : BandScale Time.Posix -> Int -> ( Time.Posix, Float ) -> Svg msg
-column scale idx ( date, value ) =
+column : Int -> BandScale Time.Posix -> Int -> ( Time.Posix, Float ) -> Svg msg
+column len scale idx ( date, value ) =
     g []
         [ rect
             [ x <| Scale.convert scale date
-            , y <| Scale.convert yyScale (toFloat idx)
+            , y <| Scale.convert (yyScale len) (toFloat idx)
             , height <| Scale.bandwidth scale
             , width <| Scale.convert xScale value
             , fill <| Fill <| Color.rgb255 46 118 149
@@ -89,4 +89,4 @@ view networks_ =
     in
     svg
         [ width w, height h ]
-        (List.indexedMap (column (yScale networks)) networks)
+        (List.indexedMap (column (List.length networks) (yScale networks)) networks)
