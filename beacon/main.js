@@ -6,10 +6,10 @@ const queryToString = ({ time, eventType }) => {
   return `t=${Math.floor(time)}&e=${eventType}`;
 };
 
-const performanceQueryToString = ({ startTime, endTime, eventType }) => {
+const performanceQueryToString = ({ startTime, endTime, eventType, name }) => {
   return `start=${Math.floor(startTime)}&end=${Math.floor(
     endTime
-  )}&e=${eventType}`;
+  )}&e=${eventType}&name=${name}`;
 };
 
 const mutationWatcher = new MutationObserver(list => {
@@ -30,12 +30,14 @@ const performanceWatcher = new PerformanceObserver(list => {
     if (entry.name.includes(SERVER)) {
       return;
     }
+    console.log(entry.name);
     beacon.src =
       SERVER +
       performanceQueryToString({
         eventType: entry.entryType,
         startTime: timeOrigin + entry.startTime,
-        endTime: timeOrigin + entry.startTime + entry.duration
+        endTime: timeOrigin + entry.startTime + entry.duration,
+        name: entry.name
       });
     // console.log(
     //   "[%s]: %s %d..%d",

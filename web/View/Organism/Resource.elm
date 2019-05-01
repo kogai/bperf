@@ -32,11 +32,14 @@ type alias Props =
 
 
 view : Props -> Svg msg
-view durations =
-    -- let
-    --     _ =
-    --         Debug.log "durations" durations
-    -- in
+view durations_ =
+    let
+        _ =
+            List.take 50 durations_
+
+        -- _ =
+        --     Debug.log "durations" durations
+    in
     svg
         [ width 100, height 100 ]
         [ g []
