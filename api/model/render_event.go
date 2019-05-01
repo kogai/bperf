@@ -9,12 +9,17 @@ import (
 type EventType string
 
 const (
-	ChildList     EventType = "childList"
+	// ChildList is not documented.
+	ChildList EventType = "childList"
+	// CharacterData is not documented.
 	CharacterData EventType = "characterData"
-	Attributes    EventType = "attibutes"
-	Unknown       EventType = "unknown"
+	// Attributes is not documented.
+	Attributes EventType = "attibutes"
+	// Unknown is not documented.
+	Unknown EventType = "unknown"
 )
 
+// ToEventType represents shape of response.
 func ToEventType(s string) (EventType, error) {
 	switch s {
 	case "childList":
@@ -41,7 +46,16 @@ type RenderEvent struct {
 	Time      int64     `gorm:"not null"`
 }
 
-// BeaconToJSON is converter from Database model to JSON
+// ToJSON converts Database model to JSON
 func (r *RenderEvent) ToJSON() RenderEventJSON {
 	return RenderEventJSON{EventType: r.EventType, Time: r.Time}
+}
+
+// RenderEventJSONArray is not documented.
+func RenderEventJSONArray(renderEvents []RenderEvent) []RenderEventJSON {
+	var payloads = make([]RenderEventJSON, 0)
+	for _, r := range renderEvents {
+		payloads = append(payloads, r.ToJSON())
+	}
+	return payloads
 }

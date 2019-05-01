@@ -14,11 +14,7 @@ func EventsHandler(c *gin.Context) {
 
 	var renderEvents []model.RenderEvent
 	// db.Where("event_type = ?", "childList").Limit(50).Find(&beacons)
-	// db.Where("event_type = ?", "childList").Find(&beacons)
 	db.Find(&renderEvents)
-	var payloads = make([]model.RenderEventJSON, 0)
-	for _, r := range renderEvents {
-		payloads = append(payloads, r.ToJSON())
-	}
+	payloads := model.RenderEventJSONArray(renderEvents)
 	c.JSON(http.StatusOK, payloads)
 }

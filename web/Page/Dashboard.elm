@@ -14,9 +14,19 @@ view model =
             C.Failure _ ->
                 V.Failure
 
-            C.Loading ->
-                V.Loading
+            C.Success { events, durations, networks } ->
+                V.Success
+                    { events =
+                        events
+                            |> List.map (\x -> x.time)
+                    , durations =
+                        durations
+                            |> List.map (\x -> ( x.startTime, x.endTime ))
+                    , networks =
+                        networks
 
-            C.Success events ->
-                V.Success <|
-                    List.map (\event -> event.time) events
+                    -- |> List.map (\x -> ( x.startTime, x.endTime ))
+                    }
+
+            _ ->
+                V.Loading

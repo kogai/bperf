@@ -24,12 +24,14 @@ func BeaconHandler(c *gin.Context) {
 		start, _ := strconv.ParseFloat(c.Query("start"), 64)
 		end, _ := strconv.ParseFloat(c.Query("end"), 64)
 		eventType, _ := model.ToRenderDurationType(e)
-		ins := model.RenderDuration{StartTime: int64(start), EndTime: int64(end), EventType: eventType}
+		name := c.Query("name")
+		ins := model.RenderDuration{StartTime: int64(start), EndTime: int64(end), EventType: eventType, Name: name}
 		db.Create(&ins)
 	case "resource":
 		start, _ := strconv.ParseFloat(c.Query("start"), 64)
 		end, _ := strconv.ParseFloat(c.Query("end"), 64)
-		ins := model.NetworkEvent{StartTime: int64(start), EndTime: int64(end)}
+		name := c.Query("name")
+		ins := model.NetworkEvent{StartTime: int64(start), EndTime: int64(end), Name: name}
 		db.Create(&ins)
 	default:
 		fmt.Printf("Beacon [%s] does not supported yet.\n", e)

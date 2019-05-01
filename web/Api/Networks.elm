@@ -1,4 +1,4 @@
-module Api.Events exposing (Response, fetch)
+module Api.Networks exposing (Response, fetch)
 
 import Http exposing (Error(..))
 import Json.Decode as D exposing (Decoder)
@@ -6,29 +6,31 @@ import Json.Decode.Pipeline exposing (required)
 import Url.Builder as B
 
 
-type alias Event =
-    { time : Float
-    , eventType : String
+type alias Network =
+    { startTime : Float
+    , endTime : Float
+    , name : String
     }
 
 
 type alias Response =
-    List Event
+    List Network
 
 
 decoder : Decoder Response
 decoder =
     D.list
-        (D.succeed Event
-            |> required "time" D.float
-            |> required "eventType" D.string
+        (D.succeed Network
+            |> required "startTime" D.float
+            |> required "endTime" D.float
+            |> required "name" D.string
         )
 
 
 fetch : String -> String -> (Result Http.Error Response -> msg) -> Cmd msg
 fetch apiRoot idToken f =
     Http.request
-        { url = B.crossOrigin apiRoot [ "chart", "events" ] []
+        { url = B.crossOrigin apiRoot [ "chart", "networks" ] []
         , expect = Http.expectJson f decoder
         , method = "GET"
         , body = Http.emptyBody
