@@ -3,7 +3,6 @@ module View.Organism.Histogram exposing (view)
 import Axis
 import Color
 import Histogram exposing (Bin, HistogramGenerator, Threshold, binCount)
-import Html exposing (div, text)
 import Html.Attributes exposing (class)
 import Scale exposing (ContinuousScale)
 import Time exposing (toHour, toMinute, utc)

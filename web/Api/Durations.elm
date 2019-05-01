@@ -1,4 +1,4 @@
-module Api.Durations exposing (Duration, Durations, fetch)
+module Api.Durations exposing (Response, fetch)
 
 import Http exposing (Error(..))
 import Json.Decode as D exposing (Decoder)
@@ -13,11 +13,11 @@ type alias Duration =
     }
 
 
-type alias Durations =
+type alias Response =
     List Duration
 
 
-decoder : Decoder Durations
+decoder : Decoder Response
 decoder =
     D.list
         (D.succeed Duration
@@ -27,7 +27,7 @@ decoder =
         )
 
 
-fetch : String -> String -> (Result Http.Error Durations -> msg) -> Cmd msg
+fetch : String -> String -> (Result Http.Error Response -> msg) -> Cmd msg
 fetch apiRoot idToken f =
     Http.request
         { url = B.crossOrigin apiRoot [ "chart", "durations" ] []

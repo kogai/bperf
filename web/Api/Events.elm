@@ -1,4 +1,4 @@
-module Api.Events exposing (Event, Events, fetchEvents, fromHttpError)
+module Api.Events exposing (Response, fetch)
 
 import Http exposing (Error(..))
 import Json.Decode as D exposing (Decoder)
@@ -12,11 +12,11 @@ type alias Event =
     }
 
 
-type alias Events =
+type alias Response =
     List Event
 
 
-decoder : Decoder Events
+decoder : Decoder Response
 decoder =
     D.list
         (D.succeed Event
@@ -25,27 +25,8 @@ decoder =
         )
 
 
-fromHttpError : Http.Error -> String
-fromHttpError e =
-    case e of
-        BadUrl reason ->
-            "bad url " ++ reason
-
-        BadStatus status ->
-            "bad status " ++ String.fromInt status
-
-        BadBody reason ->
-            "bad body " ++ reason
-
-        Timeout ->
-            "timeout"
-
-        NetworkError ->
-            "network error"
-
-
-fetchEvents : String -> String -> (Result Http.Error Events -> msg) -> Cmd msg
-fetchEvents apiRoot idToken f =
+fetch : String -> String -> (Result Http.Error Response -> msg) -> Cmd msg
+fetch apiRoot idToken f =
     Http.request
         { url = B.crossOrigin apiRoot [ "chart", "events" ] []
         , expect = Http.expectJson f decoder

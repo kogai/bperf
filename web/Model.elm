@@ -1,5 +1,6 @@
 module Model exposing (Flags, Model, Msg(..), init, mapAuth, mapRoute, update)
 
+import Api.Durations
 import Api.Events
 import Browser.Navigation as Nav
 import Model.Auth as A
@@ -46,7 +47,10 @@ whenUrlChanged model route =
                 msg =
                     case model.auth of
                         A.Success { idToken } ->
-                            Api.Events.fetchEvents model.apiRoot idToken C.Response
+                            Cmd.batch
+                                [ Api.Events.fetch model.apiRoot idToken C.EventsMsg
+                                , Api.Durations.fetch model.apiRoot idToken C.DurationsMsg
+                                ]
 
                         _ ->
                             Cmd.none

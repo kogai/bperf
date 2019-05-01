@@ -13,7 +13,10 @@ import View.Template.Common as Layout
 type Props
     = Failure
     | Loading
-    | Success (List Float)
+    | Success
+        { events : List Float
+        , durations : List ( Float, Float )
+        }
 
 
 panel : Html msg -> Html msg
@@ -36,7 +39,7 @@ view props =
             Failure ->
                 text "Unable to load events"
 
-            Success events ->
+            Success { events } ->
                 div []
                     [ panel <| Resource.view [ ( 10, 20 ) ]
                     , panel <| Histogram.view events
