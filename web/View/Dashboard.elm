@@ -6,6 +6,7 @@ import TypedSvg.Attributes exposing (class)
 import TypedSvg.Core exposing (Svg)
 import TypedSvg.Types exposing (Fill(..), Transform(..))
 import View.Organism.Histogram as Histogram
+import View.Organism.Resource as Resource
 import View.Template.Common as Layout
 
 
@@ -37,5 +38,6 @@ view props =
 
             Success events ->
                 div []
-                    [ panel <| Histogram.view events
+                    [ panel <| Resource.view [ ( 10, 20 ) ]
+                    , panel <| Histogram.view events
                     ]
