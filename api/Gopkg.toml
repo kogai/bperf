@@ -48,3 +48,7 @@
 [[constraint]]
   name = "github.com/auth0-community/go-auth0"
   version = "1.0.0"
+
+[[constraint]]
+  name = "github.com/mssola/user_agent"
+  version = "0.5.0"

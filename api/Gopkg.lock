@@ -119,6 +119,14 @@
   version = "1.0.1"
 
 [[projects]]
+  digest = "1:12c305f5ce44a799edabd05b5a8f3c4ad9475f8d9c357eefd8e3425711a6e39c"
+  name = "github.com/mssola/user_agent"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "a0de238bd1e52f40d71e0ca5b000d2be7c59d99a"
+  version = "v0.5.0"
+
+[[projects]]
   digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
   name = "github.com/pmezard/go-difflib"
   packages = ["difflib"]
@@ -200,6 +208,7 @@
     "github.com/gin-gonic/gin",
     "github.com/jinzhu/gorm",
     "github.com/jinzhu/gorm/dialects/postgres",
+    "github.com/mssola/user_agent",
     "github.com/stretchr/testify/assert",
     "gopkg.in/square/go-jose.v2",
   ]

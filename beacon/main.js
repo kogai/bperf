@@ -1,19 +1,22 @@
+const uuid = require("uuid");
 const beacon = new Image();
 const timeOrigin = performance.timeOrigin;
 const SERVER = "http://localhost:5000/beacon?";
+const sessionId = uuid.v4();
+
+beacon.src = SERVER + `e=init&id=${sessionId}`;
 
 const queryToString = ({ time, eventType }) => {
-  return `t=${Math.floor(time)}&e=${eventType}`;
+  return `t=${Math.floor(time)}&e=${eventType}&id=${sessionId}`;
 };
 
 const performanceQueryToString = ({ startTime, endTime, eventType, name }) => {
   return `start=${Math.floor(startTime)}&end=${Math.floor(
     endTime
-  )}&e=${eventType}&name=${name}`;
+  )}&e=${eventType}&name=${name}&id=${sessionId}`;
 };
 
 const mutationWatcher = new MutationObserver(list => {
-  // console.log("[EVENT] On DOM mutate", list.length);
   list.forEach(entry => {
     beacon.src =
       SERVER +
@@ -25,7 +28,6 @@ const mutationWatcher = new MutationObserver(list => {
 });
 
 const performanceWatcher = new PerformanceObserver(list => {
-  // console.log("[EVENT] On Perf entity changed");
   list.getEntries().forEach(entry => {
     if (entry.name.includes(SERVER)) {
       return;
@@ -38,13 +40,6 @@ const performanceWatcher = new PerformanceObserver(list => {
         endTime: timeOrigin + entry.startTime + entry.duration,
         name: entry.name
       });
-    // console.log(
-    //   "[%s]: %s %d..%d",
-    //   entry.entryType,
-    //   entry.name,
-    //   entry.startTime,
-    //   entry.startTime + entry.duration
-    // );
   });
 });
 
