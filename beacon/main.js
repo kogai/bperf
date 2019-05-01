@@ -30,7 +30,6 @@ const performanceWatcher = new PerformanceObserver(list => {
     if (entry.name.includes(SERVER)) {
       return;
     }
-    console.log(entry.name);
     beacon.src =
       SERVER +
       performanceQueryToString({

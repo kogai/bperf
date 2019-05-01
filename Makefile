@@ -11,3 +11,9 @@ install:
 
 db/run:
 	$(DC) run -e PGPASSWORD=$(POSTGRES_PASSWORD) --rm db psql -h postgres -U $(DB_USER) -d $(DB_DATABASE)
+
+db/reset:
+	$(DC) run -e PGPASSWORD=$(POSTGRES_PASSWORD) --rm db psql -h postgres -U $(DB_USER) -c "drop database bperf"
+
+db/size:
+	$(DC) run -e PGPASSWORD=$(POSTGRES_PASSWORD) --rm db psql -h postgres -U $(DB_USER) -c "select pg_size_pretty( pg_database_size('bperf'))"

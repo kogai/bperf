@@ -51,12 +51,12 @@ histogram model =
 
 w : Float
 w =
-    400
+    700
 
 
 h : Float
 h =
-    250
+    300
 
 
 padding : Float

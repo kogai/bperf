@@ -2,7 +2,6 @@ module View.Dashboard exposing (Props(..), view)
 
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (class)
-import TypedSvg.Attributes exposing (class)
 import TypedSvg.Core exposing (Svg)
 import TypedSvg.Types exposing (Fill(..), Transform(..))
 import View.Organism.Histogram as Histogram
@@ -22,10 +21,10 @@ type Props
 
 panel : Html msg -> Html msg
 panel x =
-    div [ class [ "panel" ] ]
-        [ div [ class [ "panel-heading" ] ] [ text "rendering events" ]
+    div [ class "panel" ]
+        [ div [ class "panel-heading" ] [ text "rendering events" ]
         , div
-            [ class [ "panel-block" ] ]
+            [ class "panel-block" ]
             [ x ]
         ]
 
