@@ -16,6 +16,7 @@ view children =
                 , li [ class "level-item level-right" ] [ a [ href "/dashboard" ] [ text "dashboard" ] ]
                 , li [ class "level-item level-right" ] [ a [ href "/account" ] [ text "account" ] ]
                 , li [ class "level-item level-right" ] [ a [ href "/sign_in" ] [ text "sign in" ] ]
+                , li [ class "level-item level-right" ] [ text "select product" ]
                 ]
             ]
         , div [ class "container", style "padding" "1rem" ]
