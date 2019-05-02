@@ -10,6 +10,7 @@ type Model
     | SignIn Nav.Key
     | Dashboard Nav.Key
     | Callback Nav.Key
+    | Account Nav.Key
 
 
 type Msg
@@ -32,6 +33,9 @@ keyOf model =
         Callback k ->
             k
 
+        Account k ->
+            k
+
 
 init : Url.Url -> Nav.Key -> Model
 init url key =
@@ -44,6 +48,9 @@ init url key =
 
         "/callback" ->
             Callback key
+
+        "/account" ->
+            Account key
 
         _ ->
             NotFound key

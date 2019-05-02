@@ -14,6 +14,7 @@ view children =
             [ ul [ class "level" ]
                 [ li [ class "level-item level-left" ] [ a [ href "/" ] [ text "bperf" ] ]
                 , li [ class "level-item level-right" ] [ a [ href "/dashboard" ] [ text "dashboard" ] ]
+                , li [ class "level-item level-right" ] [ a [ href "/account" ] [ text "account" ] ]
                 , li [ class "level-item level-right" ] [ a [ href "/sign_in" ] [ text "sign in" ] ]
                 ]
             ]

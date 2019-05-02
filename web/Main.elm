@@ -6,6 +6,7 @@ import Html exposing (div, text)
 import Model as M
 import Model.Auth as A
 import Model.Route as R exposing (Msg(..))
+import Page.Account
 import Page.Callback
 import Page.Dashboard
 import Page.Progress as Progress
@@ -50,6 +51,13 @@ view model =
             , body =
                 [ Page.SignIn.view model
                 , Html.map M.Progress <| Progress.view model.progress
+                ]
+            }
+
+        R.Account _ ->
+            { title = "account | bperf"
+            , body =
+                [ Page.Account.view
                 ]
             }
 
