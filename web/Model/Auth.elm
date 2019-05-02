@@ -4,6 +4,8 @@ import Api.User
 import Json.Decode as D exposing (Decoder, int, oneOf, string)
 import Json.Decode.Pipeline exposing (required)
 import Json.Encode as E
+import Task
+import Time
 
 
 type alias AuthError =
@@ -29,6 +31,7 @@ type Msg
     = StartAuth
     | OnCallback E.Value
     | OnCreateUser
+    | OnCreateUserComplete
 
 
 type alias AuthPayload =
@@ -103,7 +106,8 @@ update apiRoot msg model =
                     ( Success x
                     , Cmd.batch
                         [ setSessions x
-                        , Api.User.createUser apiRoot x.accessToken (\_ -> OnCreateUser)
+                        , Api.User.createUser apiRoot x.accessToken (\_ -> OnCreateUserComplete)
+                        , Task.perform (\_ -> OnCreateUser) Time.now
                         ]
                     )
 
@@ -114,4 +118,7 @@ update apiRoot msg model =
             ( UnAuthorized, doStartAuth () )
 
         OnCreateUser ->
+            ( model, Cmd.none )
+
+        OnCreateUserComplete ->
             ( model, Cmd.none )

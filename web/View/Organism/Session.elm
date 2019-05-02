@@ -1,5 +1,6 @@
-module View.Organism.Histogram exposing (view)
+module View.Organism.Session exposing (view)
 
+import Api.Sessions
 import Axis
 import Color
 import Constant.Chart as C
@@ -94,13 +95,15 @@ column model yScale { length, x0, x1 } =
         []
 
 
-type alias Props =
-    List Float
-
-
-view : Props -> Svg msg
-view props =
+view : Api.Sessions.Response -> Svg msg
+view sessions =
     let
+        props =
+            sessions
+                |> List.map (\{ createdAt } -> Time.posixToMillis createdAt)
+                |> List.map toFloat
+                |> List.map ((*) 1000)
+
         bins =
             histogram props
     in

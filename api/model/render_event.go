@@ -41,7 +41,7 @@ type RenderEventJSON struct {
 
 // RenderEvent is not documented.
 type RenderEvent struct {
-	Session   Session   `gorm:"not null"`
+	SessionID string    `gorm:"not null"`
 	EventType EventType `gorm:"not null"  sql:"type:event_type"`
 	Time      int64     `gorm:"not null"`
 }

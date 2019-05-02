@@ -8,5 +8,6 @@ import (
 type MonitoringTarget struct {
 	gorm.Model
 	PublishableID string `gorm:"not null"`
-	Sessions      []Session
+	// FIXME: Define as Has Many
+	Sessions []Session
 }

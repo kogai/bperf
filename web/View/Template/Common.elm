@@ -6,8 +6,11 @@ import Html.Attributes exposing (class, href, style)
 
 view : Html msg -> Html msg
 view children =
-    div []
-        [ header [ style "border-bottom" "1px solid #eee", style "padding" "1rem" ]
+    div [ style "position" "relative" ]
+        [ header
+            [ style "border-bottom" "1px solid #eee"
+            , style "padding" "1rem"
+            ]
             [ ul [ class "level" ]
                 [ li [ class "level-item level-left" ] [ a [ href "/" ] [ text "bperf" ] ]
                 , li [ class "level-item level-right" ] [ a [ href "/dashboard" ] [ text "dashboard" ] ]
