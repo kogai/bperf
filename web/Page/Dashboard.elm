@@ -14,7 +14,7 @@ view model =
             C.Failure _ ->
                 V.Failure
 
-            C.Success { events, durations, networks } ->
+            C.Dataset { events, durations, networks } ->
                 V.Success
                     { events =
                         events
@@ -25,6 +25,3 @@ view model =
                     , networks =
                         networks
                     }
-
-            _ ->
-                V.Loading

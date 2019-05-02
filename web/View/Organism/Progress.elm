@@ -1,9 +1,9 @@
 module View.Organism.Progress exposing (view)
 
-import Css exposing (borderRadius, bottom, fixed, height, left, num, opacity, pc, pct, position, px, right, top, width)
+import Css exposing (bottom, fixed, position, px, right)
 import Html exposing (Html)
-import Html.Styled exposing (div, i, progress, span, text, toUnstyled)
-import Html.Styled.Attributes as S exposing (class, css, max, value)
+import Html.Styled exposing (div, i, span, toUnstyled)
+import Html.Styled.Attributes exposing (class, css)
 
 
 view : Html msg

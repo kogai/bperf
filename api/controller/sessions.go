@@ -8,11 +8,23 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-// SessionsJSON represents shape of response.
+// SessionIntermediate is not documented.
+type SessionIntermediate struct {
+	CreatedAt time.Time
+	Os        string
+	Browser   string
+}
+
+// toJSON converts Database model to JSON
+func (r *SessionIntermediate) toJSON() SessionsJSON {
+	return SessionsJSON{CreatedAt: r.CreatedAt.Unix(), Os: r.Os, Browser: r.Browser}
+}
+
+// SessionsJSON  is not documented.
 type SessionsJSON struct {
-	CreatedAt time.Time `json:"createdAt"`
-	Os        string    `json:"os"`
-	Browser   string    `json:"browser"`
+	CreatedAt int64  `json:"createdAt"`
+	Os        string `json:"os"`
+	Browser   string `json:"browser"`
 }
 
 // SessionsHandler is not documented.
@@ -26,12 +38,13 @@ func SessionsHandler(c *gin.Context) {
 	defer rows.Close()
 
 	var payloads = make([]SessionsJSON, 0)
-	// FIXME: Seems very slow. and the SQL command seems fast.
+	// FIXME: Seems very slow, it costs almost 1 ~ 2 secondes. And the SQL command seems still fast(almost 3ms).
 	for rows.Next() {
-		var payload SessionsJSON
+		var payload SessionIntermediate
 
 		db.ScanRows(rows, &payload)
-		payloads = append(payloads, payload)
+
+		payloads = append(payloads, payload.toJSON())
 	}
 
 	c.JSON(http.StatusOK, payloads)

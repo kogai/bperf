@@ -4,7 +4,6 @@ import Api.User
 import Json.Decode as D exposing (Decoder, int, oneOf, string)
 import Json.Decode.Pipeline exposing (required)
 import Json.Encode as E
-import Page.Progress as P
 import Task
 import Time
 
@@ -108,7 +107,7 @@ update apiRoot msg model =
                     , Cmd.batch
                         [ setSessions x
                         , Api.User.createUser apiRoot x.accessToken (\_ -> OnCreateUserComplete)
-                        , Task.perform (\n -> OnCreateUser) Time.now
+                        , Task.perform (\_ -> OnCreateUser) Time.now
                         ]
                     )
 
