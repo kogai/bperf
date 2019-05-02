@@ -7,6 +7,7 @@ import Browser.Navigation as Nav
 import Model.Auth as A
 import Model.Chart as C
 import Model.Route as R
+import Page.Progress as P
 import Url
 
 
@@ -20,6 +21,7 @@ type alias Model =
     { route : R.Model
     , auth : A.Model
     , chart : C.Model
+    , progress : P.Model
     , apiRoot : String
     }
 
@@ -28,6 +30,7 @@ type Msg
     = Auth A.Msg
     | Chart C.Msg
     | Route R.Msg
+    | Progress P.Msg
 
 
 mapRoute : (msgPayload -> R.Msg) -> msgPayload -> Msg
@@ -73,6 +76,7 @@ init { apiRoot, sessions } url key =
             { route = R.init url key
             , auth = A.init sessions
             , chart = C.init
+            , progress = P.init
             , apiRoot = apiRoot
             }
     in
@@ -96,7 +100,24 @@ update msg model =
                 ( subModel, subCmd ) =
                     C.update subMsg model.chart
             in
-            ( { model | chart = subModel }, Cmd.map Chart subCmd )
+            ( { model | chart = subModel }
+            , Cmd.batch
+                [ Cmd.map Chart subCmd
+                , case subModel of
+                    C.Loading _ ->
+                        Cmd.map Progress <| P.onLoadStart ()
+
+                    _ ->
+                        Cmd.map Progress <| P.onLoadComplete 2
+                ]
+            )
+
+        Progress subMsg ->
+            let
+                subModel =
+                    P.update subMsg model.progress
+            in
+            ( { model | progress = subModel }, Cmd.none )
 
         Route subMsg ->
             let

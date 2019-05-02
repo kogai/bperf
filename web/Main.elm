@@ -8,10 +8,10 @@ import Model.Auth as A
 import Model.Route as R exposing (Msg(..))
 import Page.Callback
 import Page.Dashboard
+import Page.Progress as Progress
 import Page.SignIn
 import TypedSvg.Types exposing (AnchorAlignment(..), Transform(..))
 import Url
-import View.Organism.Progress as Progress
 
 
 init : M.Flags -> Url.Url -> Nav.Key -> ( M.Model, Cmd M.Msg )
@@ -41,7 +41,7 @@ view model =
             { title = "dashbaord | bperf"
             , body =
                 [ Page.Dashboard.view model
-                , Progress.view ( 15, 100 )
+                , Html.map M.Progress <| Progress.view model.progress
                 ]
             }
 
@@ -49,7 +49,7 @@ view model =
             { title = "sign in | bperf"
             , body =
                 [ Page.SignIn.view model
-                , Progress.view ( 15, 100 )
+                , Html.map M.Progress <| Progress.view model.progress
                 ]
             }
 

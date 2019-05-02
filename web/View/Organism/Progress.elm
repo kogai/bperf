@@ -1,36 +1,22 @@
 module View.Organism.Progress exposing (view)
 
-import Css exposing (borderRadius, fixed, height, left, num, opacity, pc, position, px, top, width)
+import Css exposing (borderRadius, bottom, fixed, height, left, num, opacity, pc, pct, position, px, right, top, width)
 import Html exposing (Html)
-import Html.Attributes exposing (class)
-import Html.Styled exposing (div, progress, text, toUnstyled)
-import Html.Styled.Attributes as S exposing (css, max, value)
+import Html.Styled exposing (div, i, progress, span, text, toUnstyled)
+import Html.Styled.Attributes as S exposing (class, css, max, value)
 
 
-view : ( Int, Int ) -> Html msg
-view ( v, m ) =
+view : Html msg
+view =
     toUnstyled <|
-        if v /= m then
-            div
-                [ css
-                    [ position fixed
-                    , top (px 0)
-                    , left (px 0)
-                    , width (pc 100)
-                    ]
+        div
+            [ css
+                [ position fixed
+                , bottom (px 10)
+                , right (px 10)
                 ]
-                [ progress
-                    [ value <| String.fromInt 15
-                    , max <| String.fromInt 100
-                    , S.class "progress is-info"
-                    , css
-                        [ height (px 5)
-                        , opacity (num 0.7)
-                        , borderRadius (px 0)
-                        ]
-                    ]
-                    [ text "15%" ]
+            ]
+            [ span [ class "icon is-medium has-text-info" ]
+                [ i [ class "fas fa-spinner fa-pulse fa-2x" ] []
                 ]
-
-        else
-            div [] []
+            ]
