@@ -1,4 +1,4 @@
-module Page.Progress exposing (Model, Msg(..), init, onLoadComplete, onLoadStart, update, view)
+module Page.Progress exposing (Model, Msg(..), init, onLoadAbort, onLoadComplete, onLoadStart, update, view)
 
 import Html exposing (Html, div)
 import Task
@@ -12,7 +12,8 @@ type alias Model =
 
 type Msg
     = OnLoad
-    | OnComplete Int
+    | OnComplete
+    | OnAbort
 
 
 init : Model
@@ -25,9 +26,14 @@ onLoadStart _ =
     Task.perform (\_ -> OnLoad) Time.now
 
 
-onLoadComplete : Int -> Cmd Msg
-onLoadComplete n =
-    Task.perform (\_ -> OnComplete n) Time.now
+onLoadComplete : () -> Cmd Msg
+onLoadComplete _ =
+    Task.perform (\_ -> OnComplete) Time.now
+
+
+onLoadAbort : () -> Cmd Msg
+onLoadAbort _ =
+    Task.perform (\_ -> OnAbort) Time.now
 
 
 update : Msg -> Model -> Model
@@ -36,8 +42,11 @@ update msg model =
         OnLoad ->
             model + 1
 
-        OnComplete n ->
-            model - n
+        OnComplete ->
+            model - 1
+
+        OnAbort ->
+            0
 
 
 view : Model -> Html Msg

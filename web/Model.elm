@@ -60,7 +60,12 @@ whenUrlChanged model route =
                         _ ->
                             Cmd.none
             in
-            Cmd.map Chart <| msg
+            Cmd.batch
+                [ Cmd.map Chart <| msg
+                , Cmd.map Progress <| P.onLoadStart ()
+                , Cmd.map Progress <| P.onLoadStart ()
+                , Cmd.map Progress <| P.onLoadStart ()
+                ]
 
         R.Callback _ ->
             Cmd.map Auth <| A.doVisitAuthCallback ()
@@ -92,8 +97,24 @@ update msg model =
             let
                 ( subModel, subCmd ) =
                     A.update model.apiRoot subMsg model.auth
+
+                progressCmd =
+                    case subMsg of
+                        A.OnCreateUser ->
+                            P.onLoadStart ()
+
+                        A.OnCreateUserComplete ->
+                            P.onLoadComplete ()
+
+                        _ ->
+                            Cmd.none
             in
-            ( { model | auth = subModel }, Cmd.map Auth subCmd )
+            ( { model | auth = subModel }
+            , Cmd.batch
+                [ Cmd.map Auth subCmd
+                , Cmd.map Progress <| progressCmd
+                ]
+            )
 
         Chart subMsg ->
             let
@@ -104,11 +125,11 @@ update msg model =
             , Cmd.batch
                 [ Cmd.map Chart subCmd
                 , case subModel of
-                    C.Loading _ ->
-                        Cmd.map Progress <| P.onLoadStart ()
+                    C.Failure _ ->
+                        Cmd.map Progress <| P.onLoadAbort ()
 
                     _ ->
-                        Cmd.map Progress <| P.onLoadComplete 2
+                        Cmd.map Progress <| P.onLoadComplete ()
                 ]
             )
 
