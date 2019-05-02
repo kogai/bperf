@@ -14,7 +14,7 @@ view model =
             C.Failure _ ->
                 V.Failure
 
-            C.Dataset { events, durations, networks } ->
+            C.Dataset { events, durations, networks, sessions } ->
                 V.Success
                     { events =
                         events
@@ -24,4 +24,6 @@ view model =
                             |> List.map (\x -> ( x.startTime, x.endTime ))
                     , networks =
                         networks
+                    , sessions =
+                        sessions
                     }

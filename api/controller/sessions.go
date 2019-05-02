@@ -30,7 +30,7 @@ type SessionsJSON struct {
 // SessionsHandler is not documented.
 func SessionsHandler(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
-	rows, err := db.Table("sessions as S").Select("S.created_at, U.os, U.browser").Joins("left join ua_os as U on S.id = U.session_id").Rows()
+	rows, err := db.Table("sessions as S").Select("S.created_at, U.os, U.browser").Joins("left join ua_os as U on S.id = U.session_id").Order("S.created_at asc").Rows()
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{})
 		return

@@ -1,6 +1,7 @@
 module View.Organism.Resource exposing (view)
 
 import Color
+import Constant.Chart as C
 import Scale exposing (BandScale, ContinuousScale, defaultBandConfig)
 import Time
 import TypedSvg exposing (g, rect, style, svg, text_)
@@ -10,25 +11,10 @@ import TypedSvg.Core exposing (Svg, text)
 import TypedSvg.Types exposing (Fill(..), Transform(..))
 
 
-w : Float
-w =
-    700
-
-
-h : Float
-h =
-    300
-
-
-padding : Float
-padding =
-    30
-
-
 yScale : List ( Time.Posix, Float ) -> BandScale Time.Posix
 yScale model =
     List.map Tuple.first model
-        |> Scale.band { defaultBandConfig | paddingInner = 0.1, paddingOuter = 0.1 } ( 0, h - 2 * padding )
+        |> Scale.band { defaultBandConfig | paddingInner = 0.1, paddingOuter = 0.1 } ( 0, C.h - 2 * C.p )
 
 
 {-| Scale.linear : outputRange -> inputRange -> Scale
@@ -42,12 +28,12 @@ yScale model =
 -}
 xScale : ContinuousScale Float
 xScale =
-    Scale.linear ( 0, w ) ( 0, 3000 )
+    Scale.linear ( 0, C.w ) ( 0, 3000 )
 
 
 yyScale : Int -> ContinuousScale Float
 yyScale len =
-    Scale.linear ( 0, h ) ( 0, toFloat len )
+    Scale.linear ( 0, C.h ) ( 0, toFloat len )
 
 
 column :
@@ -97,7 +83,7 @@ view networks_ =
                 |> List.map (\{ startTime, duration, name } -> { duration = duration, name = name, startTime = Time.millisToPosix startTime })
     in
     svg
-        [ width w, height h ]
+        [ width C.w, height C.h ]
         [ style [] [ text """
             .column text { display: none; }
             .column:hover text { display: inline; }
