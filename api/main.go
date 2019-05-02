@@ -35,6 +35,7 @@ func setRouter() (*gin.Engine, error) {
 	chart.GET("/events", c.EventsHandler)
 	chart.GET("/durations", c.DurationsHandler)
 	chart.GET("/networks", c.NetworksHandler)
+	chart.GET("/sessions", c.SessionsHandler)
 
 	return r, nil
 }
