@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -49,6 +51,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	log, err := os.Create(fmt.Sprintf("./tmp/%d.log", time.Now().Unix()))
+	if err != nil {
+		panic(err)
+	}
+	r.Use(gin.LoggerWithWriter(log))
 	// defer conn.Close()
 
 	port := s.EnsureEnv("PORT", "5000")
