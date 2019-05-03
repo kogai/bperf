@@ -8,6 +8,7 @@ import Browser.Navigation as Nav
 import Model.Auth as A
 import Model.Chart as C
 import Model.Route as R
+import Page.Account
 import Page.Progress as P
 import Url
 
@@ -23,6 +24,7 @@ type alias Model =
     , auth : A.Model
     , chart : C.Model
     , progress : P.Model
+    , account : Page.Account.Model
     , apiRoot : String
     }
 
@@ -32,6 +34,7 @@ type Msg
     | Chart C.Msg
     | Route R.Msg
     | Progress P.Msg
+    | Account Page.Account.Msg
 
 
 mapRoute : (msgPayload -> R.Msg) -> msgPayload -> Msg
@@ -80,16 +83,23 @@ whenUrlChanged model route =
 init : Flags -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init { apiRoot, sessions } url key =
     let
+        ( account, accountMsg ) =
+            Page.Account.init apiRoot sessions
+
         model =
             { route = R.init url key
             , auth = A.init sessions
             , chart = C.init
             , progress = P.init
+            , account = account
             , apiRoot = apiRoot
             }
     in
     ( model
-    , whenUrlChanged model model.route
+    , Cmd.batch
+        [ whenUrlChanged model model.route
+        , Cmd.map Account accountMsg
+        ]
     )
 
 
@@ -135,6 +145,24 @@ update msg model =
                         Cmd.map Progress <| P.onLoadComplete ()
                 ]
             )
+
+        Account subMsg ->
+            let
+                subModel =
+                    Page.Account.update subMsg model.account
+
+                nextMsg =
+                    case subMsg of
+                        Page.Account.OnLoad ->
+                            Cmd.map Progress <| P.onLoadStart ()
+
+                        Page.Account.OnAbort _ ->
+                            Cmd.map Progress <| P.onLoadAbort ()
+
+                        Page.Account.OnComplete _ ->
+                            Cmd.map Progress <| P.onLoadComplete ()
+            in
+            ( { model | account = subModel }, nextMsg )
 
         Progress subMsg ->
             let
