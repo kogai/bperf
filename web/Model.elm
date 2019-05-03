@@ -83,7 +83,7 @@ whenUrlChanged model route =
 init : Flags -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init { apiRoot, sessions } url key =
     let
-        ( account, _ ) =
+        ( account, accountMsg ) =
             Page.Account.init apiRoot sessions
 
         model =
@@ -96,7 +96,10 @@ init { apiRoot, sessions } url key =
             }
     in
     ( model
-    , whenUrlChanged model model.route
+    , Cmd.batch
+        [ whenUrlChanged model model.route
+        , Cmd.map Account accountMsg
+        ]
     )
 
 

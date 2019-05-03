@@ -9,7 +9,7 @@ import View.Template.Common as Layout
 
 
 view : Api.Response -> UnStyled.Html msg
-view { privilege, email } =
+view { privilege, mail } =
     div
         []
         [ table [ class "table is-bordered is-fullwidth is-striped", css [ width (pct 100) ] ]
@@ -63,7 +63,7 @@ view { privilege, email } =
                         [ text "mail address" ]
                     , td
                         []
-                        [ text email ]
+                        [ text mail ]
                     ]
                 ]
             ]

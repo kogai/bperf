@@ -50,10 +50,6 @@ init apiRoot auth =
 
 update : Msg -> Model -> Model
 update msg model =
-    let
-        _ =
-            Debug.log "Local(msg,model)" ( msg, model )
-    in
     case msg of
         OnLoad ->
             model

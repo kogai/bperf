@@ -8,7 +8,7 @@ import Url.Builder as B
 
 type alias Response =
     { privilege : String
-    , email : String
+    , mail : String
     }
 
 
@@ -16,7 +16,7 @@ decoder : Decoder Response
 decoder =
     D.succeed Response
         |> required "privilege" D.string
-        |> required "email" D.string
+        |> required "mail" D.string
 
 
 fetch : String -> ( String, String ) -> (Result Http.Error Response -> msg) -> Cmd msg
