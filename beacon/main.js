@@ -1,7 +1,9 @@
 const uuid = require("uuid");
+
+const { API_ROOT } = process.env;
 const beacon = new Image();
 const timeOrigin = performance.timeOrigin;
-const SERVER = "http://localhost:5000/beacon?";
+const SERVER = `${API_ROOT}/beacon?`;
 const sessionId = uuid.v4();
 
 beacon.src = SERVER + `e=init&id=${sessionId}`;
@@ -57,5 +59,5 @@ performanceWatcher.observe({
 window.addEventListener("beforeunload", () => {
   mutationWatcher.disconnect();
   performanceWatcher.disconnect();
-  beacon.src = "http://localhost:5000/close";
+  beacon.src = `${API_ROOT}/close`;
 });
