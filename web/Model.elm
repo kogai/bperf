@@ -8,6 +8,7 @@ import Browser.Navigation as Nav
 import Model.Auth as A
 import Model.Chart as C
 import Model.Route as R
+import Page.Account
 import Page.Progress as P
 import Url
 
@@ -23,6 +24,7 @@ type alias Model =
     , auth : A.Model
     , chart : C.Model
     , progress : P.Model
+    , account : Page.Account.Model
     , apiRoot : String
     }
 
@@ -32,6 +34,7 @@ type Msg
     | Chart C.Msg
     | Route R.Msg
     | Progress P.Msg
+    | Account Page.Account.Msg
 
 
 mapRoute : (msgPayload -> R.Msg) -> msgPayload -> Msg
@@ -80,11 +83,15 @@ whenUrlChanged model route =
 init : Flags -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init { apiRoot, sessions } url key =
     let
+        ( account, _ ) =
+            Page.Account.init apiRoot sessions
+
         model =
             { route = R.init url key
             , auth = A.init sessions
             , chart = C.init
             , progress = P.init
+            , account = account
             , apiRoot = apiRoot
             }
     in
@@ -135,6 +142,13 @@ update msg model =
                         Cmd.map Progress <| P.onLoadComplete ()
                 ]
             )
+
+        Account subMsg ->
+            let
+                subModel =
+                    Page.Account.update subMsg model.account
+            in
+            ( { model | account = subModel }, Cmd.none )
 
         Progress subMsg ->
             let

@@ -57,7 +57,8 @@ view model =
         R.Account _ ->
             { title = "account | bperf"
             , body =
-                [ Page.Account.view
+                [ Html.map M.Account <| Page.Account.view model.account
+                , Html.map M.Progress <| Progress.view model.progress
                 ]
             }
 

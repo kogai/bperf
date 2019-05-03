@@ -1,5 +1,6 @@
 module View.Account exposing (view)
 
+import Api.AccountDetail as Api
 import Css exposing (pct, width)
 import Html as UnStyled
 import Html.Styled exposing (div, li, table, tbody, td, text, th, thead, toUnstyled, tr, ul)
@@ -7,8 +8,8 @@ import Html.Styled.Attributes exposing (class, css)
 import View.Template.Common as Layout
 
 
-view : UnStyled.Html msg
-view =
+view : Api.Response -> UnStyled.Html msg
+view { privilege, email } =
     div
         []
         [ table [ class "table is-bordered is-fullwidth is-striped", css [ width (pct 100) ] ]
@@ -55,14 +56,14 @@ view =
                         [ text "your privilege" ]
                     , td
                         []
-                        [ text "admin" ]
+                        [ text privilege ]
                     ]
                 , tr []
                     [ th []
                         [ text "mail address" ]
                     , td
                         []
-                        [ text "foo@example.com" ]
+                        [ text email ]
                     ]
                 ]
             ]
