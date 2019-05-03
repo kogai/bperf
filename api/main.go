@@ -37,6 +37,9 @@ func setRouter() (*gin.Engine, error) {
 	chart.GET("/networks", c.NetworksHandler)
 	chart.GET("/sessions", c.SessionsHandler)
 
+	account := r.Group("/account")
+	account.GET("/detail", c.AccountDetailHandler)
+
 	return r, nil
 }
 

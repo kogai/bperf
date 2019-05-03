@@ -23,8 +23,9 @@ type UserInfo struct {
 	EmailVerified bool   `json:"email_verified"`
 }
 
-func retrieveOpenID(accessToken string) (string, error) {
+func retrieveOpenID(accessToken string) (UserInfo, error) {
 	var err error
+	var u UserInfo
 	client := &http.Client{}
 
 	url := fmt.Sprintf("https://%s/userinfo", service.EnsureEnv("AUTH0_DOMAIN", nil))
@@ -32,15 +33,14 @@ func retrieveOpenID(accessToken string) (string, error) {
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", accessToken))
 	response, err := client.Do(req)
 	if err != nil {
-		return "", err
+		return u, err
 	}
-	var u UserInfo
 	decoder := json.NewDecoder(response.Body)
 	err = decoder.Decode(&u)
 	if err != nil {
-		return "", err
+		return u, err
 	}
-	return u.Sub, nil
+	return u, nil
 }
 
 // UserHandler is not documented.
@@ -54,14 +54,14 @@ func UserHandler(c *gin.Context) {
 		return
 	}
 
-	id, err := retrieveOpenID(params.AccessToken)
+	userInfo, err := retrieveOpenID(params.AccessToken)
 	if err != nil {
 		fmt.Printf("%v", err)
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 
-	ins := model.User{PlatformID: id, Products: []model.Product{}, Privilege: "admin"}
+	ins := model.User{PlatformID: userInfo.Sub, Products: []model.Product{}, Privilege: "admin"}
 	result := db.Create(&ins)
 	if result.Error != nil {
 		// User already registered.
