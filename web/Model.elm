@@ -1,14 +1,10 @@
 module Model exposing (Flags, Model, Msg(..), init, mapAuth, mapRoute, update)
 
-import Api.Durations
-import Api.Events
-import Api.Networks
-import Api.Sessions
 import Browser.Navigation as Nav
 import Model.Auth as A
-import Model.Chart as C
 import Model.Route as R
 import Page.Account
+import Page.Dashboard
 import Page.Progress as P
 import Url
 
@@ -22,8 +18,8 @@ type alias Flags =
 type alias Model =
     { route : R.Model
     , auth : A.Model
-    , chart : C.Model
     , progress : P.Model
+    , dashboard : Page.Dashboard.Model
     , account : Page.Account.Model
     , apiRoot : String
     }
@@ -31,9 +27,9 @@ type alias Model =
 
 type Msg
     = Auth A.Msg
-    | Chart C.Msg
     | Route R.Msg
     | Progress P.Msg
+    | Dashboard Page.Dashboard.Msg
     | Account Page.Account.Msg
 
 
@@ -47,32 +43,9 @@ mapAuth f x =
     Auth <| f x
 
 
-whenUrlChanged : Model -> R.Model -> Cmd Msg
-whenUrlChanged model route =
+whenUrlChanged : R.Model -> Cmd Msg
+whenUrlChanged route =
     case route of
-        R.Dashboard _ ->
-            let
-                msg =
-                    case model.auth of
-                        A.Success { idToken } ->
-                            Cmd.batch
-                                [ Api.Events.fetch model.apiRoot idToken C.EventsMsg
-                                , Api.Durations.fetch model.apiRoot idToken C.DurationsMsg
-                                , Api.Networks.fetch model.apiRoot idToken C.NetworkMsg
-                                , Api.Sessions.fetch model.apiRoot idToken C.SessionsMsg
-                                ]
-
-                        _ ->
-                            Cmd.none
-            in
-            Cmd.batch
-                [ Cmd.map Chart <| msg
-                , Cmd.map Progress <| P.onLoadStart ()
-                , Cmd.map Progress <| P.onLoadStart ()
-                , Cmd.map Progress <| P.onLoadStart ()
-                , Cmd.map Progress <| P.onLoadStart ()
-                ]
-
         R.Callback _ ->
             Cmd.map Auth <| A.doVisitAuthCallback ()
 
@@ -83,13 +56,16 @@ whenUrlChanged model route =
 init : Flags -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init { apiRoot, sessions } url key =
     let
+        ( dashboard, dashboardMsg ) =
+            Page.Dashboard.init apiRoot sessions
+
         ( account, accountMsg ) =
             Page.Account.init apiRoot sessions
 
         model =
             { route = R.init url key
             , auth = A.init sessions
-            , chart = C.init
+            , dashboard = dashboard
             , progress = P.init
             , account = account
             , apiRoot = apiRoot
@@ -97,7 +73,8 @@ init { apiRoot, sessions } url key =
     in
     ( model
     , Cmd.batch
-        [ whenUrlChanged model model.route
+        [ whenUrlChanged model.route
+        , Cmd.map Dashboard dashboardMsg
         , Cmd.map Account accountMsg
         ]
     )
@@ -129,22 +106,23 @@ update msg model =
                 ]
             )
 
-        Chart subMsg ->
+        Dashboard subMsg ->
             let
-                ( subModel, subCmd ) =
-                    C.update subMsg model.chart
-            in
-            ( { model | chart = subModel }
-            , Cmd.batch
-                [ Cmd.map Chart subCmd
-                , case subModel of
-                    C.Failure _ ->
-                        Cmd.map Progress <| P.onLoadAbort ()
+                subModel =
+                    Page.Dashboard.update subMsg model.dashboard
 
-                    _ ->
-                        Cmd.map Progress <| P.onLoadComplete ()
-                ]
-            )
+                nextMsg =
+                    case subMsg of
+                        Page.Dashboard.OnLoad ->
+                            Cmd.map Progress <| P.onLoadStart ()
+
+                        Page.Dashboard.OnAbort _ ->
+                            Cmd.map Progress <| P.onLoadAbort ()
+
+                        Page.Dashboard.OnComplete _ ->
+                            Cmd.map Progress <| P.onLoadComplete ()
+            in
+            ( { model | dashboard = subModel }, nextMsg )
 
         Account subMsg ->
             let
@@ -179,6 +157,6 @@ update msg model =
             ( { model | route = subModel }
             , Cmd.batch
                 [ Cmd.map Route subCmd
-                , whenUrlChanged model subModel
+                , whenUrlChanged subModel
                 ]
             )
