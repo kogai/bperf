@@ -41,7 +41,7 @@ view model =
         R.Dashboard _ ->
             { title = "dashbaord | bperf"
             , body =
-                [ Page.Dashboard.view model
+                [ Html.map M.Dashboard <| Page.Dashboard.view model.dashboard
                 , Html.map M.Progress <| Progress.view model.progress
                 ]
             }

@@ -1,4 +1,4 @@
-module View.Dashboard exposing (Props(..), view)
+module View.Dashboard exposing (Props, view)
 
 import Api.Networks
 import Api.Sessions
@@ -12,17 +12,12 @@ import View.Organism.Session as Session
 import View.Template.Common as Layout
 
 
-type Props
-    = Failure
-    | Loading
-    | Success
-        { events : List Float
-        , durations : List ( Float, Float )
-
-        -- , networks : List { name : String, startTime : Float, endTime : Float }
-        , networks : Api.Networks.Response
-        , sessions : Api.Sessions.Response
-        }
+type alias Props =
+    { events : List Float
+    , durations : List ( Float, Float )
+    , networks : Api.Networks.Response
+    , sessions : Api.Sessions.Response
+    }
 
 
 panel : String -> Html msg -> Html msg
@@ -36,18 +31,10 @@ panel title x =
 
 
 view : Props -> Svg msg
-view props =
+view { events, networks, sessions } =
     Layout.view <|
-        case props of
-            Loading ->
-                text "Loading..."
-
-            Failure ->
-                text "Unable to load events"
-
-            Success { events, networks, sessions } ->
-                div []
-                    [ panel "session" <| Session.view sessions
-                    , panel "network" <| Resource.view networks
-                    , panel "rendering" <| Histogram.view events
-                    ]
+        div []
+            [ panel "session" <| Session.view sessions
+            , panel "network" <| Resource.view networks
+            , panel "rendering" <| Histogram.view events
+            ]
