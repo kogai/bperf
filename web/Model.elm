@@ -150,8 +150,19 @@ update msg model =
             let
                 subModel =
                     Page.Account.update subMsg model.account
+
+                nextMsg =
+                    case subMsg of
+                        Page.Account.OnLoad ->
+                            Cmd.map Progress <| P.onLoadStart ()
+
+                        Page.Account.OnAbort _ ->
+                            Cmd.map Progress <| P.onLoadAbort ()
+
+                        Page.Account.OnComplete _ ->
+                            Cmd.map Progress <| P.onLoadComplete ()
             in
-            ( { model | account = subModel }, Cmd.none )
+            ( { model | account = subModel }, nextMsg )
 
         Progress subMsg ->
             let
