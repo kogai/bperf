@@ -3,7 +3,7 @@ module View.Account exposing (view)
 import Api.AccountDetail as Api
 import Css exposing (pct, width)
 import Html as UnStyled
-import Html.Styled exposing (div, li, table, tbody, td, text, th, thead, toUnstyled, tr, ul)
+import Html.Styled exposing (div, h1, li, table, tbody, td, text, th, thead, toUnstyled, tr, ul)
 import Html.Styled.Attributes exposing (class, css)
 import View.Template.Common as Layout
 
@@ -12,7 +12,8 @@ view : Api.Response -> UnStyled.Html msg
 view { privilege, mail } =
     div
         []
-        [ table [ class "table is-bordered is-fullwidth is-striped", css [ width (pct 100) ] ]
+        [ h1 [ class "title is-3" ] [ text "Product information" ]
+        , table [ class "table is-bordered is-fullwidth is-striped", css [ width (pct 100) ] ]
             [ thead []
                 [ th [] [ text "quantifier" ]
                 , th [] [ text "value" ]
@@ -51,7 +52,16 @@ view { privilege, mail } =
                         []
                         [ text "free" ]
                     ]
-                , tr []
+                ]
+            ]
+        , h1 [ class "title is-3" ] [ text "User information" ]
+        , table [ class "table is-bordered is-fullwidth is-striped", css [ width (pct 100) ] ]
+            [ thead []
+                [ th [] [ text "quantifier" ]
+                , th [] [ text "value" ]
+                ]
+            , tbody []
+                [ tr []
                     [ th []
                         [ text "your privilege" ]
                     , td
