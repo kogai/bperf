@@ -7,7 +7,9 @@ const onMeasure = Date.now();
 const SERVER = `${API_ROOT}/beacon?`;
 const sessionId = uuid.v4();
 
-beacon.src = SERVER + `e=init&id=${sessionId}`;
+// Debuggin...
+beacon.src =
+  SERVER + `e=init&id=${sessionId}&timeOrigin=${Math.floor(timeOrigin)}`;
 
 const queryToString = ({ time, eventType }) => {
   return `t=${Math.floor(time)}&e=${eventType}&id=${sessionId}`;
