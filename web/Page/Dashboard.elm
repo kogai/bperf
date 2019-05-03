@@ -123,7 +123,6 @@ view model =
                         |> List.map (\x -> x.time)
                 , durations =
                     durations
-                        |> List.map (\x -> ( x.startTime, x.endTime ))
                 , networks =
                     networks
                 , sessions =

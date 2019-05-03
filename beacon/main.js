@@ -3,6 +3,7 @@ const uuid = require("uuid");
 const { API_ROOT } = process.env;
 const beacon = new Image();
 const timeOrigin = performance.timeOrigin;
+const onMeasure = Date.now();
 const SERVER = `${API_ROOT}/beacon?`;
 const sessionId = uuid.v4();
 
@@ -38,8 +39,8 @@ const performanceWatcher = new PerformanceObserver(list => {
       SERVER +
       performanceQueryToString({
         eventType: entry.entryType,
-        startTime: timeOrigin + entry.startTime,
-        endTime: timeOrigin + entry.startTime + entry.duration,
+        startTime: onMeasure + entry.startTime,
+        endTime: onMeasure + entry.startTime + entry.duration,
         name: entry.name
       });
   });

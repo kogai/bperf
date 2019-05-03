@@ -1,5 +1,6 @@
 module View.Dashboard exposing (Props, view)
 
+import Api.Durations
 import Api.Networks
 import Api.Sessions
 import Html exposing (Html, div, text)
@@ -14,7 +15,7 @@ import View.Template.Common as Layout
 
 type alias Props =
     { events : List Float
-    , durations : List ( Float, Float )
+    , durations : Api.Durations.Response
     , networks : Api.Networks.Response
     , sessions : Api.Sessions.Response
     }

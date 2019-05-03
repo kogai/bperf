@@ -8,8 +8,7 @@ import Url.Builder as B
 
 type alias Duration =
     { startTime : Float
-    , endTime : Float
-    , eventType : String
+    , duration : Float
     }
 
 
@@ -22,8 +21,7 @@ decoder =
     D.list
         (D.succeed Duration
             |> required "startTime" D.float
-            |> required "endTime" D.float
-            |> required "eventType" D.string
+            |> required "durationMs" D.float
         )
 
 

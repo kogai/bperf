@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"time"
 )
 
 // RenderDurationEvent is not documented.
@@ -29,33 +30,11 @@ func ToRenderDurationType(s string) (RenderDurationEvent, error) {
 	}
 }
 
-// RenderDurationJSON represents shape of response.
-type RenderDurationJSON struct {
-	EventType RenderDurationEvent `json:"eventType"`
-	StartTime int64               `json:"startTime"`
-	EndTime   int64               `json:"endTime"`
-	Name      string              `json:"name"`
-}
-
 // RenderDuration is not documented.
 type RenderDuration struct {
 	SessionID string              `gorm:"not null"`
 	EventType RenderDurationEvent `gorm:"not null"  sql:"type:render_duration_event"`
-	StartTime int64               `gorm:"not null"`
-	EndTime   int64               `gorm:"not null"`
+	StartTime time.Time           `gorm:"not null"`
+	EndTime   time.Time           `gorm:"not null"`
 	Name      string              `gorm:"not null"`
-}
-
-// ToJSON is converter from Database model to JSON
-func (r *RenderDuration) ToJSON() RenderDurationJSON {
-	return RenderDurationJSON{EventType: r.EventType, StartTime: r.StartTime, EndTime: r.EndTime, Name: r.Name}
-}
-
-// RenderDurationJSONArray is not documented.
-func RenderDurationJSONArray(events []RenderDuration) []RenderDurationJSON {
-	var payloads = make([]RenderDurationJSON, 0)
-	for _, e := range events {
-		payloads = append(payloads, e.ToJSON())
-	}
-	return payloads
 }
