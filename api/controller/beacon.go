@@ -36,13 +36,13 @@ func BeaconHandler(c *gin.Context) {
 		ua := user_agent.New(c.GetHeader("User-Agent"))
 		browserName, browserVersion := ua.Browser()
 		osInfo := ua.OSInfo()
-		t, err := strToTime(c.Query("timeOrigin"))
+		createdAt, err := strToTime(c.Query("timeOrigin"))
 		if err != nil {
 			c.AbortWithStatus(http.StatusBadRequest)
 			return
 		}
 
-		session := model.Session{ID: sessionID, CreatedAt: t}
+		session := model.Session{ID: sessionID, CreatedAt: createdAt}
 		uaOs := model.UaOs{
 			SessionID: session.ID,
 			Browser:   browserName + ":" + browserVersion,

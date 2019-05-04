@@ -2,19 +2,13 @@ const uuid = require("uuid");
 
 const { API_ROOT } = process.env;
 const beacon = new Image();
-const timeOrigin = performance.timeOrigin;
 const onMeasure = Date.now();
 const SERVER = `${API_ROOT}/beacon?`;
 const sessionId = uuid.v4();
 
-// Debugging...
-if (timeOrigin !== onMeasure) {
-  console.log(timeOrigin, onMeasure);
-}
-
 const msToNs = ms => Math.floor(ms * 1000 * 1000);
 
-beacon.src = SERVER + `e=init&id=${sessionId}&timeOrigin=${msToNs(timeOrigin)}`;
+beacon.src = SERVER + `e=init&id=${sessionId}&timeOrigin=${msToNs(onMeasure)}`;
 
 const queryToString = ({ time, eventType }) => {
   return `t=${msToNs(time)}&e=${eventType}&id=${sessionId}`;
@@ -32,7 +26,7 @@ const mutationWatcher = new MutationObserver(list => {
     b.src =
       SERVER +
       queryToString({
-        time: timeOrigin + window.performance.now(),
+        time: onMeasure + window.performance.now(),
         eventType: entry.type // One of 'childList' 'attibutes' 'characterData'
       });
   });
