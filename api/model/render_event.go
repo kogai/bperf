@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"time"
 )
 
 // EventType is not documented.
@@ -43,12 +44,12 @@ type RenderEventJSON struct {
 type RenderEvent struct {
 	SessionID string    `gorm:"not null"`
 	EventType EventType `gorm:"not null"  sql:"type:event_type"`
-	Time      int64     `gorm:"not null"`
+	Time      time.Time `gorm:"not null"`
 }
 
 // ToJSON converts Database model to JSON
 func (r *RenderEvent) ToJSON() RenderEventJSON {
-	return RenderEventJSON{EventType: r.EventType, Time: r.Time}
+	return RenderEventJSON{EventType: r.EventType, Time: r.Time.Unix()}
 }
 
 // RenderEventJSONArray is not documented.
