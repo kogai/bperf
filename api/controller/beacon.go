@@ -12,6 +12,8 @@ import (
 	"github.com/mssola/user_agent"
 )
 
+const ms int64 = 1000 * 1000 * 1000
+
 func strToTime(s string) (time.Time, error) {
 	var err error
 	var t time.Time
@@ -20,7 +22,7 @@ func strToTime(s string) (time.Time, error) {
 		return t, err
 	}
 	// 123456 / 1000 -> 123,123456 % 1000 -> 456
-	t = time.Unix(timestamp/1000, timestamp%1000).UTC()
+	t = time.Unix(timestamp/ms, timestamp%ms).UTC()
 	return t, nil
 }
 

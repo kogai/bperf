@@ -12,9 +12,8 @@ import (
 	s "github.com/kogai/bperf/api/service"
 )
 
-func setRouter() (*gin.Engine, error) {
+func setRouter(r *gin.Engine) (*gin.Engine, error) {
 	var err error
-	r := gin.Default()
 	err = m.InitDatabase()
 	if err != nil {
 		return nil, err
@@ -47,19 +46,21 @@ func setRouter() (*gin.Engine, error) {
 
 func main() {
 	var err error
-	r, err := setRouter()
-	if err != nil {
-		panic(err)
-	}
+	r := gin.Default()
 	log, err := os.Create(fmt.Sprintf("./tmp/%d.log", time.Now().Unix()))
 	if err != nil {
 		panic(err)
 	}
 	r.Use(gin.LoggerWithWriter(log))
+
+	router, err := setRouter(r)
+	if err != nil {
+		panic(err)
+	}
 	// defer conn.Close()
 
 	port := s.EnsureEnv("PORT", "5000")
-	err = r.Run(fmt.Sprintf(":%s", port))
+	err = router.Run(fmt.Sprintf(":%s", port))
 	if err != nil {
 		panic(err)
 	}

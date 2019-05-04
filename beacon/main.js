@@ -7,23 +7,29 @@ const onMeasure = Date.now();
 const SERVER = `${API_ROOT}/beacon?`;
 const sessionId = uuid.v4();
 
-// Debuggin...
-beacon.src =
-  SERVER + `e=init&id=${sessionId}&timeOrigin=${Math.floor(timeOrigin)}`;
+// Debugging...
+if (timeOrigin !== onMeasure) {
+  console.log(timeOrigin, onMeasure);
+}
+
+const msToNs = ms => Math.floor(ms * 1000 * 1000);
+
+beacon.src = SERVER + `e=init&id=${sessionId}&timeOrigin=${msToNs(timeOrigin)}`;
 
 const queryToString = ({ time, eventType }) => {
-  return `t=${Math.floor(time)}&e=${eventType}&id=${sessionId}`;
+  return `t=${msToNs(time)}&e=${eventType}&id=${sessionId}`;
 };
 
 const performanceQueryToString = ({ startTime, endTime, eventType, name }) => {
-  return `start=${Math.floor(startTime)}&end=${Math.floor(
+  return `start=${msToNs(startTime)}&end=${msToNs(
     endTime
   )}&e=${eventType}&name=${name}&id=${sessionId}`;
 };
 
 const mutationWatcher = new MutationObserver(list => {
   list.forEach(entry => {
-    beacon.src =
+    const b = new Image();
+    b.src =
       SERVER +
       queryToString({
         time: timeOrigin + window.performance.now(),
@@ -37,7 +43,8 @@ const performanceWatcher = new PerformanceObserver(list => {
     if (entry.name.includes(SERVER)) {
       return;
     }
-    beacon.src =
+    const b = new Image();
+    b.src =
       SERVER +
       performanceQueryToString({
         eventType: entry.entryType,

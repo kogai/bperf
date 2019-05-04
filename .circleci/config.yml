@@ -4,11 +4,6 @@ references:
   server_image: &server_image "circleci/golang:1.11.5"
   client_image: &client_image "circleci/node:9.8.0"
   db_image: &db_image postgres:9.3
-  api_test: &api_test
-    run:
-      name: API
-      command: |
-        go test ./api
 
   install_node_modules: &install_node_modules
     run:
@@ -29,6 +24,13 @@ references:
       command: |
         npm run lint:elm
         npm run type
+
+  api_test: &api_test
+    run:
+      name: API
+      command: |
+        go test ./api
+        go test ./api/controller
 
 jobs:
   api:

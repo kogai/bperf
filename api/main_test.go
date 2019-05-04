@@ -5,12 +5,14 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestBeaconHandler(t *testing.T) {
 	var err error
-	router, err := setRouter()
+	preRouter := gin.Default()
+	router, err := setRouter(preRouter)
 	assert.Equal(t, nil, err)
 
 	w := httptest.NewRecorder()
