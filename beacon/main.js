@@ -34,6 +34,7 @@ const mutationWatcher = new MutationObserver(list => {
 
 const performanceWatcher = new PerformanceObserver(list => {
   list.getEntries().forEach(entry => {
+    console.log(entry);
     if (entry.name.includes(SERVER)) {
       return;
     }
@@ -44,7 +45,8 @@ const performanceWatcher = new PerformanceObserver(list => {
         eventType: entry.entryType,
         startTime: onMeasure + entry.startTime,
         endTime: onMeasure + entry.startTime + entry.duration,
-        name: entry.name
+        name: entry.name,
+        bodySize: entry.decodedBodySize
       });
   });
 });

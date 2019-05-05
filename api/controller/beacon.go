@@ -89,8 +89,9 @@ func BeaconHandler(c *gin.Context) {
 			return
 		}
 		sessionID := c.Query("id")
+		bodySize, _ := strconv.ParseUint(c.Query("bodySize"), 10, 64)
 		name := c.Query("name")
-		ins := model.NetworkEvent{StartTime: start, EndTime: end, Name: name, SessionID: sessionID}
+		ins := model.NewNetworkEvent(sessionID, start, end, name, bodySize)
 		db.Create(&ins)
 	default:
 		fmt.Printf("Beacon [%s] does not supported yet.\n", e)

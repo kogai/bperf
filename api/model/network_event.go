@@ -15,6 +15,18 @@ type NetworkEvent struct {
 	StartTime time.Time `gorm:"not null"`
 	EndTime   time.Time `gorm:"not null"`
 	Name      string    `gorm:"not null"`
+	BodySize  uint64
+}
+
+// NewNetworkEvent is not documented.
+func NewNetworkEvent(id string, start time.Time, end time.Time, name string, bodySize uint64) NetworkEvent {
+	return NetworkEvent{
+		StartTime: start,
+		EndTime:   end,
+		Name:      name,
+		SessionID: id,
+		BodySize:  bodySize,
+	}
 }
 
 // ToJSON is converter from Database model to JSON
