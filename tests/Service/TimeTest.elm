@@ -17,11 +17,11 @@ suite =
                         toReaadble utc <| millisToPosix 1556964000000
                 in
                 Expect.equal "2019-05-04 10:00:00" actual
-        , test "can format to string shortly" <|
+        , test "can format to string hours" <|
             \_ ->
                 let
                     actual =
-                        toReaadbleShort utc <| millisToPosix 1556964000000
+                        toReaadbleHours utc <| millisToPosix 1556964000000
                 in
                 Expect.equal "10:00:00" actual
         ]

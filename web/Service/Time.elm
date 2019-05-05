@@ -1,4 +1,4 @@
-module Service.Time exposing (toReaadble, toReaadbleShort)
+module Service.Time exposing (toReaadble, toReaadbleHours)
 
 import String exposing (join)
 import Time exposing (Month(..), Zone, toDay, toHour, toMinute, toMonth, toSecond, toYear)
@@ -53,8 +53,8 @@ toMonth_ z t =
             12
 
 
-toReaadbleShort : Zone -> Time.Posix -> String
-toReaadbleShort zone time =
+toReaadbleHours : Zone -> Time.Posix -> String
+toReaadbleHours zone time =
     List.map (\f -> toTwoDigits <| f zone time) [ toHour, toMinute, toSecond ]
         |> join ":"
 
@@ -67,6 +67,6 @@ toReaadble zone time =
                 |> join "-"
 
         hours =
-            toReaadbleShort zone time
+            toReaadbleHours zone time
     in
     years ++ " " ++ hours

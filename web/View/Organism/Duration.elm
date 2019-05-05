@@ -4,6 +4,7 @@ import Api.Durations
 import Html as UnStyled
 import Html.Styled exposing (Html, table, tbody, td, text, th, thead, toUnstyled, tr)
 import Html.Styled.Attributes exposing (class)
+import Service.Time exposing (toReaadble)
 import Time exposing (toHour, toMinute, utc)
 
 
@@ -39,7 +40,7 @@ view ds =
                 List.map
                     (\{ startTime, duration } ->
                         tableRow
-                            (startTime |> round |> Time.millisToPosix |> toUtcString)
+                            (startTime |> round |> Time.millisToPosix |> toReaadble utc)
                             (duration |> round |> String.fromInt)
                     )
                     (List.take 10 ds)
