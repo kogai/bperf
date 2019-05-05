@@ -24,6 +24,7 @@ references:
       command: |
         npm run lint:elm
         npm run type
+        npm test
 
   api_test: &api_test
     run:

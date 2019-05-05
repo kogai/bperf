@@ -16,6 +16,6 @@ func TestDurationToJSON(t *testing.T) {
 	base := RenderDurationIntermediate{CreatedAt: createdAt, EndTime: endTime}
 	actual := base.toJSON()
 
-	assert.Equal(t, createdAt.Unix(), actual.StartTime)
+	assert.Equal(t, createdAt.UnixNano()/1000000, actual.StartTime)
 	assert.Equal(t, int64(5), actual.DurationMs)
 }

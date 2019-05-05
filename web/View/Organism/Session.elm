@@ -7,19 +7,13 @@ import Constant.Chart as C
 import Histogram exposing (Bin, HistogramGenerator, Threshold, binCount)
 import Html.Attributes exposing (class)
 import Scale exposing (ContinuousScale)
-import Time exposing (toHour, toMinute, utc)
+import Service.Time exposing (toReaadbleHours)
+import Time exposing (utc)
 import TypedSvg exposing (g, rect, svg)
 import TypedSvg.Attributes exposing (class, fill, transform)
 import TypedSvg.Attributes.InPx exposing (height, width, x, y)
 import TypedSvg.Core exposing (Svg)
 import TypedSvg.Types exposing (Fill(..), Transform(..))
-
-
-toUtcString : Time.Posix -> String
-toUtcString time =
-    String.fromInt (toHour utc time)
-        ++ ":"
-        ++ String.fromInt (toMinute utc time)
 
 
 tupleMap : (a -> b) -> ( a, a ) -> ( b, b )
@@ -68,7 +62,7 @@ yScaleFromBins bins =
 
 timestampToLabel : Float -> String
 timestampToLabel x =
-    x |> round |> Time.millisToPosix |> toUtcString
+    x |> round |> Time.millisToPosix |> toReaadbleHours utc
 
 
 xAxis : List Float -> Svg msg

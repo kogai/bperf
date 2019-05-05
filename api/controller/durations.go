@@ -17,7 +17,7 @@ type RenderDurationIntermediate struct {
 // toJSON converts Database model to JSON
 func (r *RenderDurationIntermediate) toJSON() RenderDurationJSON {
 	duration := r.EndTime.Sub(r.CreatedAt)
-	return RenderDurationJSON{StartTime: r.CreatedAt.Unix(), DurationMs: duration.Nanoseconds() / 1000000}
+	return RenderDurationJSON{StartTime: r.CreatedAt.UnixNano() / 1000000, DurationMs: duration.Nanoseconds() / 1000000}
 }
 
 // RenderDurationJSON represents shape of response.
