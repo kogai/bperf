@@ -5,7 +5,7 @@ import Html as UnStyled
 import Html.Styled exposing (Html, table, tbody, td, text, th, thead, toUnstyled, tr)
 import Html.Styled.Attributes exposing (class)
 import Service.Time exposing (toReaadble)
-import Time exposing (toHour, toMinute, utc)
+import Time exposing (utc)
 
 
 tableRow : String -> String -> Html msg
@@ -17,13 +17,6 @@ tableRow k v =
             []
             [ text v ]
         ]
-
-
-toUtcString : Time.Posix -> String
-toUtcString time =
-    String.fromInt (toHour utc time)
-        ++ ":"
-        ++ String.fromInt (toMinute utc time)
 
 
 view : Api.Durations.Response -> UnStyled.Html msg
