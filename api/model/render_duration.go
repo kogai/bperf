@@ -39,6 +39,7 @@ type RenderDuration struct {
 	Name      string              `gorm:"not null"`
 }
 
+// NewRenderDuration is not documented.
 func NewRenderDuration(sessionID string, eventType RenderDurationEvent, startTime time.Time, endTime time.Time, name string) RenderDuration {
 	return RenderDuration{
 		SessionID: sessionID,

@@ -34,7 +34,6 @@ const mutationWatcher = new MutationObserver(list => {
 
 const performanceWatcher = new PerformanceObserver(list => {
   list.getEntries().forEach(entry => {
-    console.log(entry);
     if (entry.name.includes(SERVER)) {
       return;
     }

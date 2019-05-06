@@ -42,16 +42,17 @@ type RenderEventJSON struct {
 
 // RenderEvent is not documented.
 type RenderEvent struct {
-	SessionID string    `gorm:"not null"`
+	SessionID string    `gorm:"not null" gorm:"primary_key"`
 	EventType EventType `gorm:"not null"  sql:"type:event_type"`
 	Time      time.Time `gorm:"not null"`
 }
 
-func NewRenderEvent(sessionID string, eventType EventType, time_ time.Time) RenderEvent {
+// NewRenderEvent is not documented.
+func NewRenderEvent(sessionID string, eventType EventType, t time.Time) RenderEvent {
 	return RenderEvent{
 		SessionID: sessionID,
 		EventType: eventType,
-		Time:      time_,
+		Time:      t,
 	}
 }
 

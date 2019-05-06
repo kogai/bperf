@@ -8,6 +8,7 @@ type Session struct {
 	CreatedAt time.Time `gorm:"not null"`
 }
 
+// NewSession is not documented.
 func NewSession(id string, createdAt time.Time) Session {
 	return Session{
 		ID:        id,
