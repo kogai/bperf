@@ -6,3 +6,11 @@ type UaOs struct {
 	Browser   string `gorm:"not null"`
 	Os        string `gorm:"not null"`
 }
+
+func NewUaOs(sessionID string, browser string, os_ string) UaOs {
+	return UaOs{
+		SessionID: sessionID,
+		Browser:   browser,
+		Os:        os_,
+	}
+}

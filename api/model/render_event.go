@@ -47,6 +47,14 @@ type RenderEvent struct {
 	Time      time.Time `gorm:"not null"`
 }
 
+func NewRenderEvent(sessionID string, eventType EventType, time_ time.Time) RenderEvent {
+	return RenderEvent{
+		SessionID: sessionID,
+		EventType: eventType,
+		Time:      time_,
+	}
+}
+
 // ToJSON converts Database model to JSON
 func (r *RenderEvent) ToJSON() RenderEventJSON {
 	return RenderEventJSON{EventType: r.EventType, Time: r.Time.Unix()}

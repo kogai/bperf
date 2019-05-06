@@ -38,3 +38,13 @@ type RenderDuration struct {
 	EndTime   time.Time           `gorm:"not null"`
 	Name      string              `gorm:"not null"`
 }
+
+func NewRenderDuration(sessionID string, eventType RenderDurationEvent, startTime time.Time, endTime time.Time, name string) RenderDuration {
+	return RenderDuration{
+		SessionID: sessionID,
+		EventType: eventType,
+		StartTime: startTime,
+		EndTime:   endTime,
+		Name:      name,
+	}
+}
