@@ -8,8 +8,8 @@ import (
 	"github.com/kogai/bperf/api/model"
 )
 
-// EventsHandler is not documented.
-func EventsHandler(c *gin.Context) {
+// RenderEventsHandler is not documented.
+func RenderEventsHandler(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 
 	var renderEvents []model.RenderEvent
