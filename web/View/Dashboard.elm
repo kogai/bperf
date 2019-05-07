@@ -5,6 +5,7 @@ import Api.Networks
 import Api.Sessions
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (class)
+import Time
 import TypedSvg.Core exposing (Svg)
 import TypedSvg.Types exposing (Fill(..), Transform(..))
 import View.Organism.Duration as Duration
@@ -19,6 +20,7 @@ type alias Props =
     , durations : Api.Durations.Response
     , networks : Api.Networks.Response
     , sessions : Api.Sessions.Response
+    , zone : Time.Zone
     }
 
 
@@ -33,11 +35,11 @@ panel title x =
 
 
 view : Props -> Svg msg
-view { events, networks, sessions, durations } =
+view { events, networks, sessions, durations, zone } =
     Layout.view <|
         div []
-            [ panel "durations" <| Duration.view durations
-            , panel "session" <| Session.view sessions
+            [ panel "durations" <| Duration.view durations zone
+            , panel "session" <| Session.view sessions zone
             , panel "network" <| Resource.view networks
-            , panel "rendering" <| Histogram.view events
+            , panel "rendering" <| Histogram.view events zone
             ]

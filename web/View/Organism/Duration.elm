@@ -5,7 +5,7 @@ import Html as UnStyled
 import Html.Styled exposing (Html, table, tbody, td, text, th, thead, toUnstyled, tr)
 import Html.Styled.Attributes exposing (class)
 import Service.Time exposing (toReaadble)
-import Time exposing (utc)
+import Time
 
 
 tableRow : String -> String -> Html msg
@@ -19,8 +19,8 @@ tableRow k v =
         ]
 
 
-view : Api.Durations.Response -> UnStyled.Html msg
-view ds =
+view : Api.Durations.Response -> Time.Zone -> UnStyled.Html msg
+view ds zone =
     toUnstyled <|
         table
             [ class "table is-bordered is-fullwidth is-striped" ]
@@ -33,7 +33,7 @@ view ds =
                 List.map
                     (\{ startTime, duration } ->
                         tableRow
-                            (startTime |> round |> Time.millisToPosix |> toReaadble utc)
+                            (startTime |> round |> Time.millisToPosix |> toReaadble zone)
                             (duration |> round |> String.fromInt)
                     )
                     (List.take 10 ds)
