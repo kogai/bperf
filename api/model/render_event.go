@@ -3,6 +3,8 @@ package model
 import (
 	"fmt"
 	"time"
+
+	s "github.com/kogai/bperf/api/service"
 )
 
 // EventType is not documented.
@@ -58,7 +60,7 @@ func NewRenderEvent(sessionID string, eventType EventType, t time.Time) RenderEv
 
 // ToJSON converts Database model to JSON
 func (r *RenderEvent) ToJSON() RenderEventJSON {
-	return RenderEventJSON{EventType: r.EventType, Time: r.Time.Unix()}
+	return RenderEventJSON{EventType: r.EventType, Time: s.TimeToMs(r.Time)}
 }
 
 // RenderEventJSONArray is not documented.

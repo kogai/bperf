@@ -1,6 +1,10 @@
 package model
 
-import "time"
+import (
+	"time"
+
+	s "github.com/kogai/bperf/api/service"
+)
 
 // NetworkEventJSON represents shape of response.
 type NetworkEventJSON struct {
@@ -31,7 +35,7 @@ func NewNetworkEvent(id string, start time.Time, end time.Time, name string, bod
 
 // ToJSON is converter from Database model to JSON
 func (r *NetworkEvent) ToJSON() NetworkEventJSON {
-	return NetworkEventJSON{StartTime: r.StartTime.Unix(), EndTime: r.EndTime.Unix(), Name: r.Name}
+	return NetworkEventJSON{StartTime: s.TimeToMs(r.StartTime), EndTime: s.TimeToMs(r.EndTime), Name: r.Name}
 }
 
 // NetworkEventJSONArray is not documented.

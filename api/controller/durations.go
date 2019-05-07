@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	s "github.com/kogai/bperf/api/service"
 )
 
 // RenderDurationIntermediate represents shape of response.
@@ -17,7 +18,7 @@ type RenderDurationIntermediate struct {
 // toJSON converts Database model to JSON
 func (r *RenderDurationIntermediate) toJSON() RenderDurationJSON {
 	duration := r.EndTime.Sub(r.CreatedAt)
-	return RenderDurationJSON{StartTime: r.CreatedAt.UnixNano() / 1000000, DurationMs: duration.Nanoseconds() / 1000000}
+	return RenderDurationJSON{StartTime: s.TimeToMs(r.CreatedAt), DurationMs: s.DurationToMs(duration)}
 }
 
 // RenderDurationJSON represents shape of response.
