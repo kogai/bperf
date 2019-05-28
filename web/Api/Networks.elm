@@ -30,7 +30,7 @@ decoder =
 fetch : String -> String -> (Result Http.Error Response -> msg) -> Cmd msg
 fetch apiRoot idToken f =
     Http.request
-        { url = B.crossOrigin apiRoot [ "chart", "networks" ] []
+        { url = B.crossOrigin apiRoot [ "chart", "networks" ] [ B.string "from" "1556888400000000000", B.string "to" "1556891940000000000" ]
         , expect = Http.expectJson f decoder
         , method = "GET"
         , body = Http.emptyBody
