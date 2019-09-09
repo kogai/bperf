@@ -6,5 +6,5 @@ RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build
 
 FROM scratch
 WORKDIR /app
-COPY --from=build /app/api ./
-ENTRYPOINT ["/app/api"]
+COPY --from=build /app/bperf_api ./
+ENTRYPOINT ["/app/bperf_api"]
