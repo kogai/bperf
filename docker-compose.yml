@@ -24,7 +24,7 @@ services:
     image: postgres:9.3
     restart: "always"
     ports:
-      - 5432:5432
+      - 5432:5431
     environment:
       - DB_USER=$DB_USER
       - DB_PASSWORD=$DB_PASSWORD
