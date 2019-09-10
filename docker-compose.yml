@@ -12,6 +12,9 @@ services:
       - DB_USER=$DB_USER
       - DB_PASSWORD=$DB_PASSWORD
       - DB_DATABASE=$DB_DATABASE
+      - DB_PORT=$DB_PORT
+      - AUTH0_CLIENT_ID=$AUTH0_CLIENT_ID
+      - AUTH0_DOMAIN=$AUTH0_DOMAIN
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
     volumes:
       - "./api:/go/src/app"
@@ -24,7 +27,7 @@ services:
     image: postgres:9.3
     restart: "always"
     ports:
-      - 5432:5431
+      - 5431:5432
     environment:
       - DB_USER=$DB_USER
       - DB_PASSWORD=$DB_PASSWORD
