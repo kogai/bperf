@@ -5,6 +5,8 @@ COPY . /app
 RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build
 
 # FROM scratch
-# WORKDIR /app
-# COPY --from=build /app/bperf_api ./
+FROM build
+WORKDIR /app
+COPY --from=build /app/bperf_api /app/tmp/.keep ./
+RUN ls -la tmp
 ENTRYPOINT ["/app/bperf_api"]

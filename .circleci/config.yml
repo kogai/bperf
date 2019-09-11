@@ -1,7 +1,7 @@
 version: 2.1
 
 references:
-  server_image: &server_image "circleci/golang:1.11.5"
+  server_image: &server_image "circleci/golang:1.12.9"
   client_image: &client_image "circleci/node:9.8.0"
   db_image: &db_image postgres:9.3
 
@@ -14,9 +14,9 @@ references:
 
   install_vendor: &install_vendor
     run:
-      name: Install vendor
+      name: Install dependencies
       command: |
-        cd api && dep ensure
+        cd api && go build
 
   web_test: &web_test
     run:
@@ -30,12 +30,13 @@ references:
     run:
       name: API
       command: |
-        go test ./api
-        go test ./api/controller
+        cd api
+        go test ./
+        go test ./controller
 
 jobs:
   api:
-    working_directory: /go/src/github.com/kogai/bperf
+    working_directory: ~/bperf
     docker:
       - image: *server_image
       - image: *db_image
