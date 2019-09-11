@@ -46,6 +46,7 @@ func setRouter(r *gin.Engine) (*gin.Engine, error) {
 
 func main() {
 	var err error
+
 	r := gin.Default()
 	log, err := os.Create(fmt.Sprintf("./tmp/%d.log", time.Now().Unix()))
 	if err != nil {

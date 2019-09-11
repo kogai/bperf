@@ -1,5 +1,5 @@
 /public
-/api/vendor
+/api/bperf_api
 /node_modules
 /logger.min.js
 /elm-stuff

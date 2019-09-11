@@ -14,11 +14,12 @@ import (
 func InitDatabase() error {
 	var err error
 	user := service.EnsureEnv("DB_USER", nil)
+	port := service.EnsureEnv("DB_PORT", nil)
 	host := service.EnsureEnv("DB_HOST", nil)
 	password := service.EnsureEnv("DB_PASSWORD", nil)
 	dbname := service.EnsureEnv("DB_DATABASE", nil)
 
-	conn, err := sql.Open("postgres", fmt.Sprintf("host=%s user=%s password=%s sslmode=disable", host, user, password))
+	conn, err := sql.Open("postgres", fmt.Sprintf("-p %s host=%s user=%s password=%s sslmode=disable", port, host, user, password))
 	if err != nil {
 		return err
 	}
