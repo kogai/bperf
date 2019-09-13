@@ -44,7 +44,8 @@ const performanceWatcher = new PerformanceObserver(list => {
         eventType: entry.entryType,
         startTime: onMeasure + entry.startTime,
         endTime: onMeasure + entry.startTime + entry.duration,
-        name: entry.name
+        name: entry.name,
+        bodySize: entry.decodedBodySize
       });
   });
 });

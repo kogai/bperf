@@ -42,12 +42,12 @@ func BeaconHandler(c *gin.Context) {
 			return
 		}
 
-		session := model.Session{ID: sessionID, CreatedAt: createdAt}
-		uaOs := model.UaOs{
-			SessionID: session.ID,
-			Browser:   browserName + ":" + browserVersion,
-			Os:        osInfo.FullName + ":" + osInfo.Version,
-		}
+		session := model.NewSession(sessionID, createdAt)
+		uaOs := model.NewUaOs(
+			session.ID,
+			browserName+":"+browserVersion,
+			osInfo.FullName+":"+osInfo.Version,
+		)
 		db.Create(&session)
 		db.Create(&uaOs)
 
@@ -59,7 +59,7 @@ func BeaconHandler(c *gin.Context) {
 		}
 		eventType, _ := model.ToEventType(e)
 		sessionID := c.Query("id")
-		ins := model.RenderEvent{Time: t, EventType: eventType, SessionID: sessionID}
+		ins := model.NewRenderEvent(sessionID, eventType, t)
 		db.Create(&ins)
 	case "frame", "paint":
 		start, err := strToTime(c.Query("start"))
@@ -75,7 +75,7 @@ func BeaconHandler(c *gin.Context) {
 		eventType, _ := model.ToRenderDurationType(e)
 		sessionID := c.Query("id")
 		name := c.Query("name")
-		ins := model.RenderDuration{StartTime: start, EndTime: end, EventType: eventType, Name: name, SessionID: sessionID}
+		ins := model.NewRenderDuration(sessionID, eventType, start, end, name)
 		db.Create(&ins)
 	case "resource":
 		start, err := strToTime(c.Query("start"))
@@ -89,8 +89,9 @@ func BeaconHandler(c *gin.Context) {
 			return
 		}
 		sessionID := c.Query("id")
+		bodySize, _ := strconv.ParseUint(c.Query("bodySize"), 10, 64)
 		name := c.Query("name")
-		ins := model.NetworkEvent{StartTime: start, EndTime: end, Name: name, SessionID: sessionID}
+		ins := model.NewNetworkEvent(sessionID, start, end, name, bodySize)
 		db.Create(&ins)
 	default:
 		fmt.Printf("Beacon [%s] does not supported yet.\n", e)

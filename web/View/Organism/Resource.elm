@@ -17,15 +17,6 @@ yScale model =
         |> Scale.band { defaultBandConfig | paddingInner = 0.1, paddingOuter = 0.1 } ( 0, C.h - 2 * C.p )
 
 
-{-| Scale.linear : outputRange -> inputRange -> Scale
-
-
-    scale_ =
-        Scale.linear ( 50, 100 ) ( 0, 1 )
-
-    --> 75
-
--}
 xScale : ContinuousScale Float
 xScale =
     Scale.linear ( 0, C.w ) ( 0, 3000 )

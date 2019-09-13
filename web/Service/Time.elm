@@ -1,4 +1,4 @@
-module Service.Time exposing (toReaadble, toReaadbleHours)
+module Service.Time exposing (posixToNanosec, toReaadble, toReaadbleHours)
 
 import String exposing (join)
 import Time exposing (Month(..), Zone, toDay, toHour, toMinute, toMonth, toSecond, toYear)
@@ -70,3 +70,8 @@ toReaadble zone time =
             toReaadbleHours zone time
     in
     years ++ " " ++ hours
+
+
+posixToNanosec : Time.Posix -> Int
+posixToNanosec time =
+    time |> Time.posixToMillis |> (*) 1000000

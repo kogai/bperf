@@ -3,6 +3,8 @@ package model
 import (
 	"fmt"
 	"time"
+
+	s "github.com/kogai/bperf/api/service"
 )
 
 // EventType is not documented.
@@ -42,14 +44,23 @@ type RenderEventJSON struct {
 
 // RenderEvent is not documented.
 type RenderEvent struct {
-	SessionID string    `gorm:"not null"`
+	SessionID string    `gorm:"not null" gorm:"primary_key"`
 	EventType EventType `gorm:"not null"  sql:"type:event_type"`
 	Time      time.Time `gorm:"not null"`
 }
 
+// NewRenderEvent is not documented.
+func NewRenderEvent(sessionID string, eventType EventType, t time.Time) RenderEvent {
+	return RenderEvent{
+		SessionID: sessionID,
+		EventType: eventType,
+		Time:      t,
+	}
+}
+
 // ToJSON converts Database model to JSON
 func (r *RenderEvent) ToJSON() RenderEventJSON {
-	return RenderEventJSON{EventType: r.EventType, Time: r.Time.Unix()}
+	return RenderEventJSON{EventType: r.EventType, Time: s.TimeToMs(r.Time)}
 }
 
 // RenderEventJSONArray is not documented.

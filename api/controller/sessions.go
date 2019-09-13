@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	s "github.com/kogai/bperf/api/service"
 )
 
 // SessionIntermediate is not documented.
@@ -17,7 +18,7 @@ type SessionIntermediate struct {
 
 // toJSON converts Database model to JSON
 func (r *SessionIntermediate) toJSON() SessionsJSON {
-	return SessionsJSON{CreatedAt: r.CreatedAt.Unix(), Os: r.Os, Browser: r.Browser}
+	return SessionsJSON{CreatedAt: s.TimeToMs(r.CreatedAt), Os: r.Os, Browser: r.Browser}
 }
 
 // SessionsJSON  is not documented.

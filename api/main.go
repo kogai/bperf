@@ -33,7 +33,7 @@ func setRouter(r *gin.Engine) (*gin.Engine, error) {
 	// Authenticated only
 	chart := r.Group("/chart")
 	chart.Use(m.JwtMiddleware())
-	chart.GET("/events", c.EventsHandler)
+	chart.GET("/events", c.RenderEventsHandler)
 	chart.GET("/durations", c.DurationsHandler)
 	chart.GET("/networks", c.NetworksHandler)
 	chart.GET("/sessions", c.SessionsHandler)

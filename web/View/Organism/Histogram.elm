@@ -7,7 +7,7 @@ import Histogram exposing (Bin, HistogramGenerator, Threshold, binCount)
 import Html.Attributes exposing (class)
 import Scale exposing (ContinuousScale)
 import Service.Time exposing (toReaadbleHours)
-import Time exposing (utc)
+import Time
 import TypedSvg exposing (g, rect, svg)
 import TypedSvg.Attributes exposing (class, fill, transform)
 import TypedSvg.Attributes.InPx exposing (height, width, x, y)
@@ -59,15 +59,15 @@ yScaleFromBins bins =
         |> Scale.linear ( C.h - 2 * C.p, 0 )
 
 
-timestampToLabel : Float -> String
-timestampToLabel x =
-    x |> round |> Time.millisToPosix |> toReaadbleHours utc
+timestampToLabel : Time.Zone -> Float -> String
+timestampToLabel zone x =
+    x |> round |> Time.millisToPosix |> toReaadbleHours zone
 
 
-xAxis : List Float -> Svg msg
-xAxis model =
+xAxis : Time.Zone -> List Float -> Svg msg
+xAxis zone model =
     Axis.bottom
-        [ Axis.tickFormat timestampToLabel ]
+        [ Axis.tickFormat <| timestampToLabel zone ]
         (xScale model)
 
 
@@ -92,8 +92,8 @@ type alias Props =
     List Float
 
 
-view : Props -> Svg msg
-view props =
+view : Props -> Time.Zone -> Svg msg
+view props zone =
     let
         bins =
             histogram props
@@ -101,7 +101,7 @@ view props =
     svg
         [ width C.w, height C.h ]
         [ g [ transform [ Translate (C.p - 1) (C.h - C.p) ] ]
-            [ xAxis props ]
+            [ xAxis zone props ]
         , g [ transform [ Translate (C.p - 1) C.p ] ]
             [ yAxis bins ]
         , g [ transform [ Translate C.p C.p ], class [ "series" ] ] <|

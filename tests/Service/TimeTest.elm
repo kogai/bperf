@@ -24,4 +24,11 @@ suite =
                         toReaadbleHours utc <| millisToPosix 1556964000000
                 in
                 Expect.equal "10:00:00" actual
+        , test "can convert to nanoseconds" <|
+            \_ ->
+                let
+                    actual =
+                        posixToNanosec <| millisToPosix 1556964000000
+                in
+                Expect.equal (1556964000000 * 1000000) actual
         ]

@@ -19,6 +19,7 @@ type Response
     | Durations Api.Durations.Response
     | Networks Api.Networks.Response
     | Sessions Api.Sessions.Response
+    | Zone Time.Zone
 
 
 type Msg
@@ -35,6 +36,7 @@ type Model
         , durations : Api.Durations.Response
         , networks : Api.Networks.Response
         , sessions : Api.Sessions.Response
+        , zone : Time.Zone
         }
     | NotAuthenticated
 
@@ -56,6 +58,7 @@ init apiRoot auth =
             ( Fetching
             , Cmd.batch
                 [ Task.perform (\_ -> OnLoad) Time.now
+                , Task.perform (\z -> OnComplete <| Zone z) Time.here
                 , Api.Events.fetch apiRoot idToken (onReceive Events)
                 , Api.Durations.fetch apiRoot idToken (onReceive Durations)
                 , Api.Networks.fetch apiRoot idToken (onReceive Networks)
@@ -80,6 +83,7 @@ update msg model =
                     , durations = []
                     , networks = []
                     , sessions = []
+                    , zone = Time.utc
                     }
     in
     case msg of
@@ -103,6 +107,9 @@ update msg model =
                 Sessions xs ->
                     Fetched { dataset | sessions = List.append dataset.sessions xs }
 
+                Zone zone ->
+                    Fetched { dataset | zone = zone }
+
 
 view : Model -> Html Msg
 view model =
@@ -116,7 +123,7 @@ view model =
         Aborted e ->
             text <| fromHttpError e
 
-        Fetched { events, durations, networks, sessions } ->
+        Fetched { events, durations, networks, sessions, zone } ->
             V.view <|
                 { events =
                     events
@@ -127,4 +134,6 @@ view model =
                     networks
                 , sessions =
                     sessions
+                , zone =
+                    zone
                 }
