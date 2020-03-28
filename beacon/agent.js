@@ -3,7 +3,7 @@ const uuid = require("uuid");
 const { API_ROOT } = process.env;
 const beacon = new Image();
 const onMeasure = Date.now();
-const SERVER = `${API_ROOT}/beacon?`;
+const SERVER = `${API_ROOT}/log?`;
 const sessionId = uuid.v4();
 
 const msToNs = ms => Math.floor(ms * 1000 * 1000);
@@ -20,17 +20,17 @@ const performanceQueryToString = ({ startTime, endTime, eventType, name }) => {
   )}&e=${eventType}&name=${name}&id=${sessionId}`;
 };
 
-const mutationWatcher = new MutationObserver(list => {
-  list.forEach(entry => {
-    const b = new Image();
-    b.src =
-      SERVER +
-      queryToString({
-        time: onMeasure + window.performance.now(),
-        eventType: entry.type // One of 'childList' 'attibutes' 'characterData'
-      });
-  });
-});
+// const mutationWatcher = new MutationObserver(list => {
+//   list.forEach(entry => {
+//     const b = new Image();
+//     b.src =
+//       SERVER +
+//       queryToString({
+//         time: onMeasure + window.performance.now(),
+//         eventType: entry.type // One of 'childList' 'attibutes' 'characterData'
+//       });
+//   });
+// });
 
 const performanceWatcher = new PerformanceObserver(list => {
   list.getEntries().forEach(entry => {
@@ -49,19 +49,26 @@ const performanceWatcher = new PerformanceObserver(list => {
   });
 });
 
-mutationWatcher.observe(document.body, {
-  characterData: true,
-  attributes: true,
-  childList: true,
-  subtree: true
-});
+window.addEventListener("load", () => {
+  // mutationWatcher.observe(document.body, {
+  //   characterData: true,
+  //   attributes: true,
+  //   childList: true,
+  //   subtree: true
+  // });
 
-performanceWatcher.observe({
-  entryTypes: ["frame", "navigation", "resource", "paint"]
+  performanceWatcher.observe({
+    entryTypes: ["frame", "navigation", "resource", "paint"]
+  });
 });
 
 window.addEventListener("beforeunload", () => {
   mutationWatcher.disconnect();
   performanceWatcher.disconnect();
-  beacon.src = `${API_ROOT}/close`;
+  beacon.src =
+    SERVER +
+    queryToString({
+      time: onMeasure + window.performance.now(),
+      eventType: "close"
+    });
 });

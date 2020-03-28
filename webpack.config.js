@@ -9,7 +9,7 @@ const { AUTH0_DOMAIN, AUTH0_CLIENT_ID, API_ROOT } = process.env;
 
 module.exports = {
   entry: {
-    beacon: "./beacon/main.js",
+    beacon: "./beacon/agent.js",
     main: "./web/index.js"
   },
   module: {
@@ -39,7 +39,7 @@ module.exports = {
   },
   output: {
     filename: chunkData => {
-      return chunkData.chunk.name === "bperf"
+      return chunkData.chunk.name === "beacon"
         ? "[name].js"
         : "[name].[chunkhash].js";
     },
