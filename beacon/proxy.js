@@ -1,13 +1,13 @@
-exports.handler = async ({ queryStringParameters } = {}) => {
+exports.handler = async ({ queryStringParameters: queryStringParameters_ }) => {
+  const queryStringParameters = queryStringParameters_ || {};
   const sessionId = queryStringParameters.id;
-  const sessionStart = queryStringParameters.timeOrigin;
 
-  const eventType = queryStringParameters.e; // 'resource'
+  const eventType = queryStringParameters.type; // 'resource'
   const eventStartTime = queryStringParameters.start;
   const eventEndTime = queryStringParameters.end;
   const name = queryStringParameters.name;
 
-  console.log([eventType, name, eventStartTime, eventEndTime].join(" "));
+  console.log([sessionId, eventType, name, eventEndTime - eventStartTime, eventStartTime, eventEndTime].join(" "));
 
   return {
     statusCode: 200
